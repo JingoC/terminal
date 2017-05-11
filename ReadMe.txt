@@ -4,7 +4,6 @@ volatile uint8_t rsbuf[50];
 volatile uint16_t lengthRsBuf = 0;
 volatile bool CmdExec = false;
 
-// функция команды
 uint8_t _test_cmd(char** argv, uint8_t argc)
 {
 	if (argc < 3)
@@ -19,14 +18,13 @@ uint8_t _test_cmd(char** argv, uint8_t argc)
 	return TE_OK;
 }
 
-// функция обработчик сигнала о конце ввода команды
+// Function callback event presset Enter key (config in file terminal_config.h)
 void RS_RXCallback(uint8_t* buf, uint16_t length)
 {
 	CmdExec = true;
 	memcpy(rsbuf, buf, length);
 }
 
-// инициализация терминала
 void Init()
 {
 	TerminalInit();
@@ -35,13 +33,12 @@ void Init()
 	TerminalAddCmd("test", _test_cmd, "test command\n\r\t\ttest [arg1]");
 }
 
-// прерывание о приходе символа от внешенго устройства
+// uart interrupt
 UART_Interrupt()
 {
 	TerminalPutChar(UART_GetChar());
 }
 
-// основная фукнция
 void main()
 {
 	Init();
