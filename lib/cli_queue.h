@@ -5,16 +5,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/// \brief Struct Queue
 typedef struct
 {
-	void* ptrObj;			// указатель на объекты
-	uint16_t size;			// размер очереди
-	uint16_t _cntr;			// заполненность очереди
-	uint8_t sizeObj;		// размер одного объекта
-	uint32_t mode;			// режим работы очереди
+    void* ptrObj;			// pointer on objects
+    uint16_t size;			// queue size
+    uint16_t _cntr;			// queue count added objects
+    uint8_t sizeObj;		// one object size
+    uint32_t mode;			// queue work mode
 } Queue_s;
 
-#define QUEUE_FORCED_PUSH_POP_Msk		(0x01)		// принудительно добавлять элемент, даже если очередь заполнена
+#define QUEUE_FORCED_PUSH_POP_Msk		(0x01)		// Forced queue filling
 
 typedef Queue_s QueueObj;
 

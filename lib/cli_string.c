@@ -1,4 +1,4 @@
-#include "string_split.h"
+#include "cli_string.h"
 #include "terminal_config.h"
 
 void _strcpy(const char* src, uint16_t offsetSrc, char* dst, uint16_t offsetDst, uint16_t length);
@@ -92,7 +92,7 @@ char* _trim(const char* src)
     }
 
     if (coStart == len){
-        result = _malloc(sizeof(char));
+        result = cli_malloc(sizeof(char));
         result[0] = '\0';
         return result;
     }
@@ -104,7 +104,7 @@ char* _trim(const char* src)
     }
 
     lengthDst = len - coStart - coEnd;
-    result = _malloc(sizeof(char) * lengthDst);
+    result = cli_malloc(sizeof(char) * lengthDst);
     _strcpy(src, coStart, result, 0, lengthDst);
     return result;
 }

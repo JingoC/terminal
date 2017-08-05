@@ -1,13 +1,13 @@
-#include "terminal_time.h"
+#include "cli_time.h"
 
-TTime _def_time;
+CLI_Time_s _def_time;
 
 /// \brief Получить время в TTime из милисекунд
 /// \param {uint32_t} msec - время в милисекундах
 /// \return {TTime} - время
-TTime generateTimeMSec(uint32_t msec)
+CLI_Time_s CLI_GenerateTimeMSec(uint32_t msec)
 {
-	TTime res;
+    CLI_Time_s res;
 	res.msec = msec % 1000;
 	uint32_t s = msec / 1000;
 	res.second = s % 60;
@@ -22,9 +22,9 @@ TTime generateTimeMSec(uint32_t msec)
 /// \brief Получить время в TTime из секунд
 /// \param {uint32_t} sec - время в секундах
 /// \return {TTime} - время
-TTime generateTime(uint32_t sec)
+CLI_Time_s CLI_GenerateTime(uint32_t sec)
 {
-	TTime res;
+    CLI_Time_s res;
 	res.msec = 0;
 	res.second = sec % 60;
 	uint32_t m = sec / 60;
@@ -38,7 +38,7 @@ TTime generateTime(uint32_t sec)
 /// \brief Получить время в секундах из структуры
 /// \param {TTime*} t - время
 /// \return {uint32_t} - время в секундах
-uint32_t inline getTime(TTime* t)
+inline uint32_t CLI_GetTime(CLI_Time_s* t)
 {
 	uint32_t sec = t->hour * 3600 + t->minute * 60 + t->second;
 	return sec;
@@ -47,23 +47,23 @@ uint32_t inline getTime(TTime* t)
 /// \brief Получить время в милисекундах из структуры
 /// \param {TTime*} t - время
 /// \return {uint32_t} - время в милисекундах
-uint32_t inline getTimeMSec(TTime* t)
+inline uint32_t CLI_GetTimeMSec(CLI_Time_s* t)
 {
 	uint32_t sec = t->hour * 3600000 + t->minute * 60000 + t->second * 1000 + t->msec;
 	return sec;
 }
 
-void inline setTimeSec(TTime* t, uint32_t sec)
+inline void CLI_SetTimeSec(CLI_Time_s* t, uint32_t sec)
 {
-	*t = generateTime(sec);
+    *t = CLI_GenerateTime(sec);
 }
 
-void inline setTimeMSec(TTime* t, uint32_t msec)
+inline void CLI_SetTimeMSec(CLI_Time_s* t, uint32_t msec)
 {
-	*t = generateTimeMSec(msec);
+    *t = CLI_GenerateTimeMSec(msec);
 }
 
-void inline setTime(TTime* t, uint32_t h , uint8_t m , uint8_t s)
+inline void CLI_SetTime(CLI_Time_s* t, uint32_t h , uint8_t m , uint8_t s)
 {
 	t->hour = h;// % 24;
 	t->minute = m % 60;

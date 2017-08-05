@@ -1,5 +1,5 @@
-#ifndef _STRING_A_H
-#define _STRING_A_H
+#ifndef _CLI_STRING_A_H
+#define _CLI_STRING_A_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -16,4 +16,4 @@ void ArgDestroy(args* src);
 
 void split(char* strSrc, const char* separator, args* dst);
 
-#endif // STRING_A_H
+#endif // _CLI_STRING_A_H

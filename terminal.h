@@ -1,10 +1,10 @@
-#ifndef TERMINAL_H
-#define TERMINAL_H
+#ifndef _TERMINAL_H
+#define _TERMINAL_H
 
 #include "terminal_config.h"
 
-#define printArrow()			{TerminalTx(STRING_TERM_ENTER);TerminalTx(STRING_TERM_ARROW);}	// вывод символов указывающих на ввод
-#define printArrowWithoutN()	{TerminalTx(STRING_TERM_ARROW);}
+#define printArrow()			{CLI_Printf(STRING_TERM_ENTER);CLI_Printf(STRING_TERM_ARROW);}	// вывод символов указывающих на ввод
+#define printArrowWithoutN()	{CLI_Printf(STRING_TERM_ARROW);}
 
 typedef enum{
 	TE_OK = 0,				// Все прошло успешно
@@ -37,26 +37,26 @@ typedef enum{
 	TDC_All = 0xFFFF
 }TypeDefaultCmd_e;
 
-#define Terminal_RetInt()			{ if (Termial_GetIntState()){return TE_WorkInt;}}
+#define CLI_RetInt()			{ if (CLI_GetIntState()){return TE_WorkInt;}}
 
-void TerminalInit(TypeDefaultCmd_e defCmd);
+void CLI_Init(TypeDefaultCmd_e defCmd);
 
-TE_Result_e TerminalExec(char** argv, uint8_t argc);
-TE_Result_e TerminalExecString(const char* str);
+TE_Result_e CLI_Execute(char** argv, uint8_t argc);
+TE_Result_e CLI_ExecuteString(const char* str);
 
-TA_Result_e TerminalAddCmd(const char* name, uint8_t (*fcn)(char**, uint8_t), const char* descr);
+TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(char**, uint8_t), const char* descr);
 
-bool Termial_GetIntState();
+bool CLI_GetIntState();
 
-void TerminalPrintTime(void);
-void TerminalPrintTimeWithoutRN(void);
-void TerminalPrintResultExec(uint8_t code);
-void TerminalViewCommandList(void);
+void CLI_PrintTime(void);
+void CLI_PrintTimeWithoutRN(void);
+void CLI_PrintResultExec(uint8_t code);
+void CLI_ViewCommandList(void);
 
-TC_Result_e TerminalPutChar(char c);
+TC_Result_e CLI_EnterChar(char c);
 
-void TerminalSetEnterCallback(void (*fcn)(uint8_t* rx_buf, uint16_t length));
+void CLI_SetEnterCallback(void (*fcn)(uint8_t* rx_buf, uint16_t length));
 
-int8_t TerminalGetValueByFlag(char** argv, uint8_t argc, const char* flag);
+int8_t CLI_GetValueByFlag(char** argv, uint8_t argc, const char* flag);
 
-#endif // TERMINAL_H
+#endif // _TERMINAL_H

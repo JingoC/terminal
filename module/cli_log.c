@@ -1,4 +1,4 @@
-#include "terminal_log.h"
+#include "cli_log.h"
 
 struct{
 	char cmds[TERM_CMD_LOG_SIZE][TERM_CMD_BUF_SIZE];
@@ -6,9 +6,9 @@ struct{
 	uint32_t _cntCmd;
 }TermLog;
 
-void TERM_LogInit()
+void CLI_LogInit()
 {
-	TERM_CurReset();
+    CLI_CurReset();
 	TermLog._cntCmd = 0;
 
 	for(uint32_t i = 0; i < TERM_CMD_LOG_SIZE; i++)
@@ -18,7 +18,7 @@ void TERM_LogInit()
 
 }
 
-void TERM_LogCmdPush(const char* cmd)
+void CLI_LogCmdPush(const char* cmd)
 {
 	if (TermLog._cntCmd < TERM_CMD_LOG_SIZE)
 	{
@@ -33,7 +33,7 @@ void TERM_LogCmdPush(const char* cmd)
 	}
 }
 
-const char* TERM_LogCmdGet(uint32_t index)
+const char* CLI_LogCmdGet(uint32_t index)
 {
 	if (index < TERM_CMD_LOG_SIZE)
 	{
@@ -43,7 +43,7 @@ const char* TERM_LogCmdGet(uint32_t index)
 	return NULL;
 }
 
-const char* TERM_GetNextCmd()
+const char* CLI_GetNextCmd()
 {
 	if (TermLog._curCmd < (TermLog._cntCmd - 1))
 	{
@@ -54,7 +54,7 @@ const char* TERM_GetNextCmd()
 	return NULL;
 }
 
-const char* TERM_GetLastCmd()
+const char* CLI_GetLastCmd()
 {
 
 	if (TermLog._curCmd > 0)
@@ -66,7 +66,7 @@ const char* TERM_GetLastCmd()
 	return NULL;
 }
 
-void TERM_CurReset()
+void CLI_CurReset()
 {
 	TermLog._curCmd = TermLog._cntCmd;
 }

@@ -1,24 +1,23 @@
-#include "queue.h"
+#include "cli_queue.h"
+#include "cli_malloc.h"
+
 #include "stdlib.h"
 #include "string.h"
-
-#include "../../terminal/terminal.h"
 
 void Q_Free(QueueObj* qdObj)
 {
 	Queue_s* qd = (Queue_s*) qdObj;
-	_free(qd->ptrObj);
+    _free(qd->ptrObj);
 }
 
 void Q_Init(QueueObj* qdObj, uint16_t sizeQueue, uint8_t sizeObj, uint32_t mode)
 {
 	Queue_s* qd = (Queue_s*) qdObj;
 
-	qd->ptrObj = (void*) _malloc(sizeObj * sizeQueue);
+    qd->ptrObj = (void*) _malloc(sizeObj * sizeQueue);
 
-	if (qd->ptrObj == NULL){
-		TerminalTx("\r\nNULL");
-		while(1){}
+    if (qd->ptrObj == NULL)
+    {
 	}
 
 	qd->size = sizeQueue;
