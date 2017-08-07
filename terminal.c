@@ -5,6 +5,10 @@
 #include "module/cli_time.h"
 #include "module/cli_log.h"
 
+#define printArrow()			{CLI_Printf(STRING_TERM_ENTER);CLI_Printf(STRING_TERM_ARROW);}	// вывод символов указывающих на ввод
+#define printArrowWithoutN()	{CLI_Printf(STRING_TERM_ARROW);}
+
+void _PrintResultExec(uint8_t code);
 
 extern uint8_t _strcmp(const char* str1, const char* str2);
 extern uint32_t _strlen(const char* strSrc);
@@ -34,7 +38,6 @@ inline bool CLI_GetIntState(){
 	return res;
 }
 
-
 // ************************************************************************
 
 // *********************** Terminal fcns **********************************
@@ -47,6 +50,7 @@ typedef struct{
 
 struct{
 	Queue_s symbols;							// очередь символов введенных последовательно
+	char buf_transit[TERM_CMD_BUF_SIZE + 1];	//
 	char buf_enter[TERM_CMD_BUF_SIZE + 1];		// Буфер ввода
 	char buf_enter_exec[TERM_CMD_BUF_SIZE + 1];	// Буфер ввода, при запущенной задачи
 	int16_t buf_curPos;							// Текущая позиция курсора
@@ -55,11 +59,11 @@ struct{
     TermCmd cmds[TERM_SIZE_TASK];				// Команды терминала
     uint8_t countCommand;						// Количество команд
     uint8_t executeState;						// Состояние терминала (запущена задача или нет)
+    volatile args input_args;
+    bool isEntered;								// 
 }Terminal;		// Терминал
 
 TermCmd* _findTermCmd(const char* cmdName);
-
-static volatile args _input_args;
 
 /// \brief Инициализация терминала
 /// \return none
@@ -77,11 +81,15 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
     Terminal.buf_curPos = 0;
     Terminal.buf_cntr = 0;
     Terminal.buf_cntr_exec = 0;
+    Terminal.buf_transit[Terminal.buf_cntr] = '\0';
+    Terminal.buf_transit[TERM_CMD_BUF_SIZE] = '\0';
     Terminal.buf_enter[Terminal.buf_cntr] = '\0';
     Terminal.buf_enter[TERM_CMD_BUF_SIZE] = '\0';
     Terminal.buf_enter_exec[Terminal.buf_cntr_exec] = '\0';
     Terminal.buf_enter_exec[TERM_CMD_BUF_SIZE] = '\0';
     Terminal.executeState = 0;
+    Terminal.isEntered = false;
+    
 
     CLI_SetTime(&_def_time, 0, 0, 0);
 
@@ -105,43 +113,24 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
     CLI_Printf("\r\nMax command: %d", TERM_SIZE_TASK);
     CLI_Printf("\r\n");
 
-    _input_args.argv = (char**) cli_malloc(sizeof(char*) * TERM_ARGS_BUF_SIZE);
+    Terminal.input_args.argv = (char**) cli_malloc(sizeof(char*) * TERM_ARGS_BUF_SIZE);
     for(uint8_t i = 0; i < TERM_ARGS_BUF_SIZE; i++)
-        _input_args.argv[i] = cli_malloc(sizeof(char) * (TERM_ARG_SIZE + 1));
+        Terminal.input_args.argv[i] = cli_malloc(sizeof(char) * (TERM_ARG_SIZE + 1));
 
     Q_Init(&Terminal.symbols, 3, sizeof(char), QUEUE_FORCED_PUSH_POP_Msk);
 
 #if (TERM_CMD_LOG_EN == 1)
-    TERM_LogInit();
+    CLI_LogInit();
 #endif
 
     printArrow();
 }
 
 /// \brief Выполнить команду
-/// \param {const char*} str - строка с командой и набором аттрибутов к ней
-/// \return {TE_Result_e} - Результат выполнения команды
-TE_Result_e CLI_ExecuteString(const char* str)
-{
-	split((char*)str, " ", (args*) &_input_args);
-
-	for(uint8_t i = 0; i < _input_args.argc;i++)
-        CLI_DPrintf("\r\n: %s", _input_args.argv[i]);
-
-    CLI_PrintTime();
-    TE_Result_e result = CLI_Execute(_input_args.argv, _input_args.argc);
-    CLI_PrintTime();
-
-	ArgDestroy((args*)&_input_args);
-
-	return result;
-}
-
-/// \brief Выполнить команду
 /// \param {char*} argv - аргументы (комманда и аттрибуты)
 /// \param {uint8_t} argc - количество аргументов
 /// \return {TE_Result_e} - Результат выполнения команды
-TE_Result_e CLI_Execute(char** argv, uint8_t argc)
+TE_Result_e _Execute(char** argv, uint8_t argc)
 {
     if (argc < 1)
         return TE_ArgErr;
@@ -156,6 +145,45 @@ TE_Result_e CLI_Execute(char** argv, uint8_t argc)
     }
 
     return TE_NotFound;
+}
+
+/// \brief Выполнить команду
+/// \param {const char*} str - строка с командой и набором аттрибутов к ней
+/// \return {TE_Result_e} - Результат выполнения команды
+TE_Result_e _ExecuteString(const char* str)
+{
+	split((char*)str, " ", (args*) &Terminal.input_args);
+
+#if 0
+	for(uint8_t i = 0; i < Terminal.input_args.argc;i++)
+        CLI_DPrintf("\r\n: %s", Terminal.input_args.argv[i]);
+#endif
+
+    CLI_PrintTime();
+    TE_Result_e result = _Execute(Terminal.input_args.argv, Terminal.input_args.argc);
+    CLI_PrintTime();
+
+	ArgDestroy((args*)&Terminal.input_args);
+
+#if (TERM_PRINT_ERROR_EXEC_EN == 1)
+	_PrintResultExec(result);
+#endif
+
+	return result;
+}
+
+bool CLI_Execute()
+{
+	if (Terminal.isEntered == true)
+	{
+		//CLI_DPrintf("\r\nTrue");
+		_ExecuteString((const char*)Terminal.buf_transit);
+		Terminal.isEntered = false;
+		
+		return true;
+	}
+	
+	return false;
 }
 
 /// \brief Функция добавления команды в терминал
@@ -191,7 +219,7 @@ TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(char**, uint8_t), const 
 /// \brief Вывести результат выполнения команды в терминал
 /// \param {uint8_t} code - код результата выполнения команды
 /// \return none
-void CLI_PrintResultExec(uint8_t code)
+void _PrintResultExec(uint8_t code)
 {
 	switch(code){
         case TE_NotFound:	CLI_Printf("\n\rerr: Command not found");break;
@@ -205,17 +233,15 @@ void CLI_PrintResultExec(uint8_t code)
 }
 
 /// \brief Проверка присутствия влага внутри команды
-/// \param {char**} argv - набор параметров
-/// \param {uint8_t} argc - количество параметров
 /// \param {const char*} flag - искомый флаг (предусмотрено 2 типа флагов, с чертой ('-') перед флагом подразумевает наличие значения после флага, просто символический флаг, подразумевает осутствие значения.
 /// \return int8_t - в случае наличия флага, возвращает его индекс среди параметров, в ином случае вернется -1.
-int8_t CLI_GetValueByFlag(char** argv, uint8_t argc, const char* flag)
+int8_t CLI_IndexOfFlag(const char* flag)
 {
-	for(uint8_t i = 0; i < argc; i++)
+	for(uint8_t i = 0; i < Terminal.input_args.argc; i++)
 	{
-		if (_strcmp(argv[i], flag))
+		if (_strcmp(Terminal.input_args.argv[i], flag))
 		{
-			if ((argc > (i + 1)) || (flag[0] != '-'))
+			if ((Terminal.input_args.argc > (i + 1)) || (flag[0] != '-'))
 				{return i;}
 			else
 				{return -1;}
@@ -223,16 +249,6 @@ int8_t CLI_GetValueByFlag(char** argv, uint8_t argc, const char* flag)
 	}
 
 	return -1;
-}
-
-/// \brief Вывод списка команд в отладочный терминал
-/// \return none
-void CLI_ViewCommandList(){
-    CLI_DPrintf("\nList commands:");
-    uint16_t i = 0;
-    for(; i < Terminal.countCommand; i++){
-        CLI_DPrintf("\n%-10s: 0x%X", Terminal.cmds[i].name, Terminal.cmds[i].fcn);
-    }
 }
 
 /// \brief Поиск команды среди имеющихся в терминале
@@ -309,9 +325,9 @@ uint8_t _cpur_cmd(char** argv, uint8_t argc)
 	if (argc < 2)
 		return TE_ArgErr;
 
-    uint32_t* v = (uint32_t*) (uint32_t) CLI_GetHexString(argv[1]);
+    uint32_t* v = (uint32_t*) CLI_GetHexString(argv[1]);
 
-    CLI_Printf("\r\n0x%08X: 0x%08X", (int) v, (int) *v);
+    CLI_Printf("\r\n0x%08X: 0x%08X", (uint32_t) v, (uint32_t) *v);
 
 	return TE_OK;
 }
@@ -336,12 +352,12 @@ uint8_t _cpurb_cmd(char** argv, uint8_t argc)
 	if (argc < 3)
 		return TE_ArgErr;
 
-    uint32_t* v = (uint32_t*) (uint32_t) CLI_GetHexString(argv[1]);
+    uint32_t* v = (uint32_t*) CLI_GetHexString(argv[1]);
     uint32_t c = CLI_GetDecString(argv[2]);
 
 	for(uint32_t i = 0; i < c; i++)
 	{
-        CLI_Printf("\r\n0x%08X: 0x%08X", (int) v, (int)*v);
+        CLI_Printf("\r\n0x%08X: 0x%08X", (int32_t) v, (int32_t) *v);
 		v++;
 	}
 
@@ -374,7 +390,7 @@ static void _UpdateCmd(const char* newCmd)
     CLI_PutChar('\r');
 	printArrowWithoutN();
 
-	memcpy(Terminal.buf_enter, newCmd, TERM_CMD_BUF_SIZE);
+	cli_memcpy(Terminal.buf_enter, newCmd, TERM_CMD_BUF_SIZE);
 	Terminal.buf_cntr = TERM_CMD_BUF_SIZE;
 
 
@@ -546,7 +562,7 @@ TC_Result_e CLI_EnterChar(char c)
 						(c == 0x20) || (c == '_') || (c == '-'));
 
 #if 0
-    CLI_Printf("\r\nKey Code: 0x%02X", c);
+    CLI_DPrintf("\r\nKey Code: 0x%02X", c);
 #endif
 	if (isValidKey)
 	{
@@ -554,14 +570,19 @@ TC_Result_e CLI_EnterChar(char c)
 		{
 			case TERM_KEY_ENTER:
 			{
+				Terminal.isEntered = true;
+				
 				Terminal.buf_enter[Terminal.buf_cntr] = '\0';
-
+				cli_memcpy(Terminal.buf_transit, Terminal.buf_enter, Terminal.buf_cntr + 1);
+				
 				if (enter_callback != NULL)
+				{
 					enter_callback((uint8_t*)Terminal.buf_enter, (uint16_t)Terminal.buf_cntr + 1);
+				}	
 
 #if (TERM_CMD_LOG_EN == 1)
-				TERM_LogCmdPush(Terminal.buf_enter);
-				TERM_CurReset();
+				CLI_LogCmdPush(Terminal.buf_enter);
+				CLI_CurReset();
 #endif
 				Terminal.buf_curPos = 0;
 				Terminal.buf_cntr = 0;
@@ -569,13 +590,13 @@ TC_Result_e CLI_EnterChar(char c)
 
 				return TC_Enter;
 			}break;
-			case CHAR_INTERRUPT:		{_interrupt_operation = true;TerminalTx("\r\nKey ESC");}break;
+			case CHAR_INTERRUPT:		{_interrupt_operation = true;CLI_Printf("\r\nKey ESC");}break;
 			case TERM_KEY_BACKSPACE:	{if (Terminal.buf_curPos > 0){_RemChar();}}break;
 			case TERM_KEY_RESET:		{return TC_Reset;}break;
 			case TERM_KEY_DOWN:
 			{
 #if (TERM_CMD_LOG_EN == 1)
-				const char* ptrCmd = TERM_GetNextCmd();
+				const char* ptrCmd = CLI_GetNextCmd();
 				if (ptrCmd != NULL)
 					{_UpdateCmd(ptrCmd);}
 #endif
@@ -583,7 +604,7 @@ TC_Result_e CLI_EnterChar(char c)
 			case TERM_KEY_UP:
 			{
 #if (TERM_CMD_LOG_EN == 1)
-				const char* ptrCmd = TERM_GetLastCmd();
+				const char* ptrCmd = CLI_GetLastCmd();
 				if (ptrCmd != NULL)
 					{_UpdateCmd(ptrCmd);}
 #endif

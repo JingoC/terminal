@@ -22,13 +22,13 @@ void CLI_LogCmdPush(const char* cmd)
 {
 	if (TermLog._cntCmd < TERM_CMD_LOG_SIZE)
 	{
-		memcpy(TermLog.cmds[TermLog._cntCmd], cmd, TERM_CMD_BUF_SIZE);
+		cli_memcpy(TermLog.cmds[TermLog._cntCmd], cmd, TERM_CMD_BUF_SIZE);
 		TermLog._cntCmd++;
 	}
 	else
 	{
-		memcpy(&TermLog.cmds[0][0], &TermLog.cmds[1][0], TERM_CMD_BUF_SIZE*(TERM_CMD_LOG_SIZE - 1));
-		memcpy(&TermLog.cmds[TermLog._cntCmd-1][0], cmd, TERM_CMD_BUF_SIZE);
+		cli_memcpy(&TermLog.cmds[0][0], &TermLog.cmds[1][0], TERM_CMD_BUF_SIZE*(TERM_CMD_LOG_SIZE - 1));
+		cli_memcpy(&TermLog.cmds[TermLog._cntCmd-1][0], cmd, TERM_CMD_BUF_SIZE);
 		TermLog._cntCmd = TERM_CMD_LOG_SIZE;
 	}
 }

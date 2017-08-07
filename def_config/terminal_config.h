@@ -37,28 +37,33 @@
 #include <stdint.h>
 #include <stdlib.h>				// strtol, itoa
 
-#define TERM_TIMELEFT_EN				(1)			// Расчет времени
+#define TERM_TIMELEFT_EN				(0)			// Расчет времени
 #define TERM_TX_RX_EN					(1)			// Интерфейс терминала
-#define TERM_TX_RX_DEB_EN				(0)			// Дополнительный отладочный интерфейс терминала
+#define TERM_TX_RX_DEB_EN				(1)			// Дополнительный отладочный интерфейс терминала
 #define TERM_CMD_LOG_EN					(1)			// Лог введеных команд
 #define TERM_LR_KEY_EN					(1)			// Перемещение каретки вправо-влево
+#define TERM_DEFAULT_ALLOC_EN			(1)			//
+#define TERM_DEFAULT_STRING_EN			(1)			//
+#define TERM_PRINT_ERROR_EXEC_EN		(1)			// 
 
 // ******************************** keys ************************************
 
-#define TERM_KEY_ENTER					(0x0D)		// Символ ввода команды
-#define TERM_KEY_BACKSPACE				(0x08)		// Символ удаление последнего введеного символа
-#define TERM_KEY_ESCAPE					(0xF0)		// Символ прерывание операции
-#define TERM_KEY_UP						(0xF1)		//
-#define TERM_KEY_RIGHT					(0xF2)		//
-#define TERM_KEY_DOWN					(0xF3)		//
-#define TERM_KEY_LEFT					(0xF4)		//
+#define _KEY_INIT(c)					((char)c)
+
+#define TERM_KEY_ENTER					(_KEY_INIT(0x0D))		// Символ ввода команды
+#define TERM_KEY_BACKSPACE				(_KEY_INIT(0x7F))		// Символ удаление последнего введеного символа
+#define TERM_KEY_ESCAPE					(_KEY_INIT(0xF0))		// Символ прерывание операции
+#define TERM_KEY_UP						(_KEY_INIT(0xF1))		//
+#define TERM_KEY_RIGHT					(_KEY_INIT(0xF2))		//
+#define TERM_KEY_DOWN					(_KEY_INIT(0xF3))		//
+#define TERM_KEY_LEFT					(_KEY_INIT(0xF4))		//
 #define TERM_KEY_RESET					'~'			// Символ сброса cpu	(shift+Ё)
 
 // **************************************************************************
 
 // ********************** Настройки терминала *******************************
 
-#define _TERM_VER_				"v1.3"				// Версия терминала
+#define _TERM_VER_				"v1.4"				// Версия терминала
 #define TERM_SIZE_TASK          (80)				// Максимальное количество задач
 #define TERM_CMD_BUF_SIZE		(80)				// Максимальное количество символов в буффере вводимых команд
 #define TERM_CMD_LOG_SIZE		(10)				// Лог последних введенных команд
@@ -68,43 +73,37 @@
 #define STRING_TERM_ENTER		"\n\r"				// Перенос строки
 #define STRING_TERM_ARROW		">> "				// Указатель ввода ввода
 #define ECHO_EN					(1)					// Включить echo
-#define RESET_FCN				NVIC_SystemReset	// Функция сброса процессора
+#define RESET_FCN()					// Функция сброса процессора
 
 // **************************************************************************
 
 // ********************** Настройки вывода в терминал ***********************
 
 #if (TERM_TX_RX_EN == 1)
-
-//#include "RS232_PC/rs232.h"			// HW настройки rs232
-#include "debug.h"
-
-//#define TerminalTx					RS232_TXDataStr			// void fcn(const char*)			// фукнция вывода в терминал
-#define TerminalTx					DBG					// void fcn(const char*)			// фукнция вывода в терминал
+#include <stdio.h>
+extern void COM_Print(const char* str);
+extern char dbgbuffer[256];
+#define COM_Printf(...){sprintf(dbgbuffer,__VA_ARGS__);COM_Print(dbgbuffer);}
+#define CLI_Printf		COM_Printf
+extern void COM_Putc(char c);
 #if (ECHO_EN == 1)
-#define PutChar			            RS232_PutChar		// Короткая быстрая функция складывающая в fifo интерфейса символ
+#define CLI_PutChar		COM_Putc
 #else	// ECHO_EN != 1
-#define PutChar
+#define CLI_PutChar
 #endif	// ECHO_EN == 1
 
 #else	// TERM_TX_RX_EN != 1
-#define TerminalTx
-#define PutChar
+#define CLI_Printf
+#define CLI_PutChar
 #endif	// TERM_TX_RX_EN == 1
 // **************************************************************************
 
 // ************** Настройки дополнительного отладочного вывода **************
 
 #if (TERM_TX_RX_DEB_EN == 1)
-
-#include "debug.h"					// здесь дебажный вывод
-
-#define TerminalTxDebug			rtt_printf				// void fcn(str, ...)		// функция отладочного вывода при работе с терминалом
-
+#define CLI_DPrintf		printf
 #else	// TERM_TX_RX_DEB_EN != 1
-
-#define TerminalTxDebug
-
+#define CLI_DPrintf
 #endif	// TERM_TX_RX_DEB_EN == 1
 
 // **************************************************************************
@@ -135,7 +134,31 @@ extern volatile uint64_t SysTickCtr;							// Переменная содержит счетчик тактов
 
 // **************************************************************************
 
-#define atoiDec(str)        strtoll((const char*)str, NULL, 10)
-#define atoiHex(str)        strtoll((const char*)str, NULL, 16)
+// ********************** memory allocate functions *************************
+
+#if (TERM_DEFAULT_ALLOC_EN == 1)
+#include "lib/cli_malloc.h"
+#define cli_malloc		_malloc
+#define cli_free		_free
+#else
+#define cli_malloc		// your implementation
+#define cli_free		// your implementation
+#endif
+
+// **************************************************************************
+
+// *************************** string functions *****************************
+
+#if (TERM_DEFAULT_STRING_EN == 1)
+#include <string.h>
+#define cli_memcpy		memcpy
+#else
+#define cli_memcpy		// your implementation
+#endif
+
+// **************************************************************************
+
+#define CLI_GetDecString(str)        ((uint32_t) strtoll((const char*)str, NULL, 10))
+#define CLI_GetHexString(str)        ((uint32_t) strtoll((const char*)str, NULL, 16))
 
 #endif // _TERMIANL_CONFIG_H_

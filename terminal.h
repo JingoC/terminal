@@ -3,9 +3,6 @@
 
 #include "terminal_config.h"
 
-#define printArrow()			{CLI_Printf(STRING_TERM_ENTER);CLI_Printf(STRING_TERM_ARROW);}	// вывод символов указывающих на ввод
-#define printArrowWithoutN()	{CLI_Printf(STRING_TERM_ARROW);}
-
 typedef enum{
 	TE_OK = 0,				// Все прошло успешно
 	TE_Err = 1,				// Неизведанная ошибка
@@ -37,26 +34,22 @@ typedef enum{
 	TDC_All = 0xFFFF
 }TypeDefaultCmd_e;
 
+bool CLI_GetIntState();
 #define CLI_RetInt()			{ if (CLI_GetIntState()){return TE_WorkInt;}}
 
 void CLI_Init(TypeDefaultCmd_e defCmd);
 
-TE_Result_e CLI_Execute(char** argv, uint8_t argc);
-TE_Result_e CLI_ExecuteString(const char* str);
+bool CLI_Execute();
 
 TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(char**, uint8_t), const char* descr);
 
-bool CLI_GetIntState();
-
 void CLI_PrintTime(void);
 void CLI_PrintTimeWithoutRN(void);
-void CLI_PrintResultExec(uint8_t code);
-void CLI_ViewCommandList(void);
 
 TC_Result_e CLI_EnterChar(char c);
 
 void CLI_SetEnterCallback(void (*fcn)(uint8_t* rx_buf, uint16_t length));
 
-int8_t CLI_GetValueByFlag(char** argv, uint8_t argc, const char* flag);
+int8_t CLI_IndexOfFlag(const char* flag);
 
 #endif // _TERMINAL_H
