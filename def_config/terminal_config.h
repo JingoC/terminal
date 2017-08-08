@@ -45,6 +45,7 @@
 #define TERM_DEFAULT_ALLOC_EN			(1)			//
 #define TERM_DEFAULT_STRING_EN			(1)			//
 #define TERM_PRINT_ERROR_EXEC_EN		(1)			// 
+#define TERM_PRINT_ERROR_ADD_CMD_EN		(1)			// 
 
 // ******************************** keys ************************************
 
@@ -157,8 +158,5 @@ extern volatile uint64_t SysTickCtr;							// Переменная содержит счетчик тактов
 #endif
 
 // **************************************************************************
-
-#define CLI_GetDecString(str)        ((uint32_t) strtoll((const char*)str, NULL, 10))
-#define CLI_GetHexString(str)        ((uint32_t) strtoll((const char*)str, NULL, 16))
 
 #endif // _TERMIANL_CONFIG_H_

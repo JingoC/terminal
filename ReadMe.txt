@@ -10,19 +10,30 @@
 #include "terminal_config.h"
 #include "terminal.h"
 
-uint8_t _t1_cmd(char** argv, uint8_t argc)
+uint8_t _t1_cmd()
+{	
+	uint32_t a = 0x01;
+	uint32_t b = 0x10;
+	uint32_t c = 7;
+	
+	// be sure arguments
+	c = CLI_GetDecString(0);
+	
+	// optional arguments
+	CLI_GetArgHexByFlag("-a", &a);
+	CLI_GetArgHexByFlag("-b", &b);
+	
+	CLI_Printf("\r\na: 0x%08X\r\nb: 0x%08X\r\nc: %d", a, b, c);
+	
+	return TE_OK;
+}
+
+uint8_t _t2_cmd()
 {
-	if (argc < 2)
-		return TE_ArgErr;
-	
-	// variables arguments
-	int8_t w = CLI_IndexOfFlag("-b");
-	if (w >= 0)
-		CLI_Printf("\r\nB: 0x%08X", CLI_GetHexString(argv[w+1]));
-	
-	
-	uint32_t v = CLI_GetDecString(argv[1]);
-	CLI_Printf("\r\nARG: %d", v);
+	while(1)
+	{
+		CLI_RetInt();
+	}
 	
 	return TE_OK;
 }
@@ -35,7 +46,8 @@ int main(int argc, char *argv[]) {
 		CLI_Init(TDC_Time);
 		
 		// Add Terminal Command
-		CLI_AddCmd("t1", _t1_cmd, "t1 - descr");
+		CLI_AddCmd("t1", _t1_cmd, 1, TMC_PrintStartTime | TMC_PrintStopTime"t1 - description command");
+		CLI_AddCmd("t2", _t2_cmd, 1, TMC_PrintDiffTime, "t2 - description command");
 	
 		char c;
 		while(1)
@@ -50,3 +62,18 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 **************************************************************/
+
+example entered commands and result views:
+
+>> t1 19 -b 0xA10032
+00:xx:xx.xxx
+a: 0x00000001
+b: 0x00A10032
+c: 19
+00:xx:xx.xxx
+
+>> t2
+LT: 00:xx:xx.xxx
+msg: Command abort
+
+/*************************************************************/

@@ -9,6 +9,9 @@
 #define printArrowWithoutN()	{CLI_Printf(STRING_TERM_ARROW);}
 
 void _PrintResultExec(uint8_t code);
+void _PrintResultAddCmd(uint8_t code);
+void _PrintTime(CLI_Time_s* time);
+int8_t _IndexOfFlag(const char* flag);
 
 extern uint8_t _strcmp(const char* str1, const char* str2);
 extern uint32_t _strlen(const char* strSrc);
@@ -43,9 +46,11 @@ inline bool CLI_GetIntState(){
 // *********************** Terminal fcns **********************************
 
 typedef struct{
-    uint8_t (*fcn)(char** argv, uint8_t argc);			// Функция обработчик комманды
-    const char* name;									// Имя команды, по которой вызывается функция
-    const char* description;							// Описание команды (аргументы, описание действия и т.п.)
+    uint8_t (*fcn)();			// Функция обработчик комманды
+    const char* name;			// Имя команды, по которой вызывается функция
+	uint8_t argc;				// 
+	uint16_t mode;				// 
+	const char* description;	// Описание команды (аргументы, описание действия и т.п.)
 }TermCmd;		// Структура описывает команду терминала
 
 struct{
@@ -126,6 +131,43 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
     printArrow();
 }
 
+#define CLI_GetDecString(str)        ((uint32_t) strtoll((const char*)str, NULL, 10))
+#define CLI_GetHexString(str)        ((uint32_t) strtoll((const char*)str, NULL, 16))
+
+uint32_t CLI_GetArgDec(uint8_t index)
+{
+	return CLI_GetDecString(Terminal.input_args.argv[index + 1]);
+}
+
+uint32_t CLI_GetArgHex(uint8_t index)
+{
+	return CLI_GetHexString(Terminal.input_args.argv[index + 1]);
+}
+
+bool CLI_GetArgDecByFlag(const char* flag, uint32_t* outValue)
+{
+	int8_t w = _IndexOfFlag(flag);
+	if (w != 0)
+	{
+		*outValue = CLI_GetArgDec(w);
+		return true;
+	}
+	
+	return false;
+}
+
+bool CLI_GetArgHexByFlag(const char* flag, uint32_t* outValue)
+{
+	int8_t w = _IndexOfFlag(flag);
+	if (w != 0)
+	{
+		*outValue = CLI_GetArgHex(w);
+		return true;
+	}
+	
+	return false;
+}
+
 /// \brief Выполнить команду
 /// \param {char*} argv - аргументы (комманда и аттрибуты)
 /// \param {uint8_t} argc - количество аргументов
@@ -138,10 +180,31 @@ TE_Result_e _Execute(char** argv, uint8_t argc)
     TermCmd* cmd = _findTermCmd(argv[0]);
 
     if (cmd != NULL){
+		
+		if ((argc - 1) < cmd->argc)
+			return TE_ArgErr;
+		
     	Terminal.executeState = 1;
-    	TE_Result_e result = cmd->fcn(argv, argc);
+		
+		if (cmd->mode & TMC_PrintStartTime)
+			CLI_PrintTime();
+    	
+		uint32_t startMs = Terminal_GetMs();
+		TE_Result_e result = cmd->fcn(argv, argc);
+		uint32_t stopMs = Terminal_GetMs();
+		
+		if (cmd->mode & TMC_PrintStopTime)
+			CLI_PrintTime();
+		
+		if (cmd->mode & TMC_PrintDiffTime)
+		{
+			CLI_Time_s t = CLI_GenerateTimeMSec(stopMs - startMs);
+			_PrintTime(&t);
+		}
+	
     	Terminal.executeState = 0;
-    	return result;
+    	
+		return result;
     }
 
     return TE_NotFound;
@@ -159,9 +222,7 @@ TE_Result_e _ExecuteString(const char* str)
         CLI_DPrintf("\r\n: %s", Terminal.input_args.argv[i]);
 #endif
 
-    CLI_PrintTime();
     TE_Result_e result = _Execute(Terminal.input_args.argv, Terminal.input_args.argc);
-    CLI_PrintTime();
 
 	ArgDestroy((args*)&Terminal.input_args);
 
@@ -176,7 +237,6 @@ bool CLI_Execute()
 {
 	if (Terminal.isEntered == true)
 	{
-		//CLI_DPrintf("\r\nTrue");
 		_ExecuteString((const char*)Terminal.buf_transit);
 		Terminal.isEntered = false;
 		
@@ -194,18 +254,30 @@ bool CLI_Execute()
 TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(char**, uint8_t), const char* descr)
 {
     if (Terminal.countCommand >= TERM_SIZE_TASK)
+	{
+		_PrintResultAddCmd(TA_MaxCmd);
         return TA_MaxCmd;
+	}
 
     if (fcn == NULL)
-        return TA_FcnNull;
+	{
+		_PrintResultAddCmd(TA_FcnNull);
+		return TA_FcnNull;
+	}
 
     if (_strlen((char*)name) == 0)
-        return TA_EmptyName;
+	{
+		_PrintResultAddCmd(TA_EmptyName);
+		return TA_EmptyName;
+	}
 
     uint8_t i = 0;
     for(; i < Terminal.countCommand; i++)
         if (_strcmp((char*) Terminal.cmds[i].name, (char*) name))
-            return TA_RetryName;
+		{
+			_PrintResultAddCmd(TA_RetryName);
+			return TA_RetryName;
+		}
 
     uint8_t countCmd = Terminal.countCommand;
     Terminal.cmds[countCmd].fcn = fcn;
@@ -225,17 +297,33 @@ void _PrintResultExec(uint8_t code)
         case TE_NotFound:	CLI_Printf("\n\rerr: Command not found");break;
         case TE_ArgErr: 	CLI_Printf("\n\rerr: Fault argument or Fault number arguments");break;
         case TE_ExecErr:	CLI_Printf("\n\rerr: Execute functions");break;
-        case TE_WorkInt:	CLI_Printf("\n\rerr: Command abort");break;
+        case TE_WorkInt:	CLI_Printf("\n\rmsg: Command abort");break;
 		default:break;
 	}
 
 	printArrow();
 }
 
+/// \brief Вывести результат выполнения команды в терминал
+/// \param {uint8_t} code - код результата выполнения команды
+/// \return none
+void _PrintResultAddCmd(uint8_t code)
+{
+#if (TERM_PRINT_ERROR_ADD_CMD_EN == 1)
+	switch(code){
+        case TA_MaxCmd:		CLI_Printf("\n\radd cmd err: Memory is full");break;
+        case TA_FcnNull: 	CLI_Printf("\n\radd cmd err: Function callback is NULL");break;
+        case TA_EmptyName:	CLI_Printf("\n\radd cmd err: Empty name command");break;
+        case TA_RetryName:	CLI_Printf("\n\radd cmd err: Retry name command");break;
+		default:break;
+	}
+#endif
+}
+
 /// \brief Проверка присутствия влага внутри команды
 /// \param {const char*} flag - искомый флаг (предусмотрено 2 типа флагов, с чертой ('-') перед флагом подразумевает наличие значения после флага, просто символический флаг, подразумевает осутствие значения.
 /// \return int8_t - в случае наличия флага, возвращает его индекс среди параметров, в ином случае вернется -1.
-int8_t CLI_IndexOfFlag(const char* flag)
+int8_t _IndexOfFlag(const char* flag)
 {
 	for(uint8_t i = 0; i < Terminal.input_args.argc; i++)
 	{
@@ -367,13 +455,18 @@ uint8_t _cpurb_cmd(char** argv, uint8_t argc)
 
 // ************************************************************************
 
+void _PrintTime(CLI_Time_s* time)
+{
+	CLI_Printf("\r\n%02d:%02d:%02d.%03d", (int) t.hour, (int) t.minute, (int) t.second, (int) t.msec);
+}
+
 /// \brief Вывод текущего времени в терминал
 /// \return none
 void CLI_PrintTime()
 {
 	uint32_t ms = Terminal_GetMs();
     CLI_Time_s t = CLI_GenerateTimeMSec(CLI_GetTimeMSec(&_def_time) + ms);
-    CLI_Printf("\r\n%02d:%02d:%02d.%03d", (int) t.hour, (int) t.minute, (int) t.second, (int) t.msec);
+    _PrintTime(&t)
 }
 
 /// \brief Вывод текущего времени в терминал без перевода строки
@@ -382,7 +475,7 @@ void CLI_PrintTimeWithoutRN()
 {
 	uint32_t ms = Terminal_GetMs();
     CLI_Time_s t = CLI_GenerateTimeMSec(CLI_GetTimeMSec(&_def_time) + ms);
-    CLI_Printf("%02d:%02d:%02d.%03d", (int) t.hour, (int) t.minute, (int) t.second, (int) t.msec);
+	_PrintTime(&t)
 }
 
 static void _UpdateCmd(const char* newCmd)
@@ -402,7 +495,7 @@ static void _UpdateCmd(const char* newCmd)
 			Terminal.buf_cntr = i;
 		}
 
-		if (i > Terminal.buf_cntr)
+		if (i >= Terminal.buf_cntr)
 		{
 			remCntr++;
             CLI_PutChar(' ');

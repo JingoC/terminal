@@ -34,6 +34,14 @@ typedef enum{
 	TDC_All = 0xFFFF
 }TypeDefaultCmd_e;
 
+typedef enum{
+	TMC_None = 0x0000,
+	TMC_PrintStartTime = 0x0001,
+	TMC_PrintStopTime = 0x0002,
+	TMC_PrintDiffTime = 0x0004,
+	TMC_All = 0xFFFF,
+}TypeModeCmd_e;
+
 bool CLI_GetIntState();
 #define CLI_RetInt()			{ if (CLI_GetIntState()){return TE_WorkInt;}}
 
@@ -41,15 +49,18 @@ void CLI_Init(TypeDefaultCmd_e defCmd);
 
 bool CLI_Execute();
 
-TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(char**, uint8_t), const char* descr);
+TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(char**, uint8_t), uint8_t argc, uint16_t mode, const char* descr);
 
 void CLI_PrintTime(void);
 void CLI_PrintTimeWithoutRN(void);
 
 TC_Result_e CLI_EnterChar(char c);
-
 void CLI_SetEnterCallback(void (*fcn)(uint8_t* rx_buf, uint16_t length));
 
-int8_t CLI_IndexOfFlag(const char* flag);
+bool CLI_GetArgDecByFlag(const char* flag, uint32_t* outValue);
+bool CLI_GetArgHexByFlag(const char* flag, uint32_t* outValue);
+
+uint32_t CLI_GetArgDec(uint8_t index);
+uint32_t CLI_GetArgHex(uint8_t index);
 
 #endif // _TERMINAL_H
