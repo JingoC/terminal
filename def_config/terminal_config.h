@@ -1,32 +1,10 @@
 /*************************************************************************
  *
- * 				Конфигурационный файл терминала
- * 	Для использования данного терминала, требуется скопировать все
- * 	исходники терминала в проект, и произвести конфигурацию параметров
- * 	согласно используемому проекту.
- *
- * 	Основные параматры:
- *
- * 	TERM_SIZE_TASK 		- максимальное количество команд терминала
- * 	TERM_CMD_BUF_SIZE	- максимальная длина 1 вводимой команды
- *	ECHO_EN				- добавлиять эхо при приходе нового символа
- *
- *
- *	Для выдачи результата терминалом требуется заполнить макросы:
- *	TerminalTx			- функция реализующая вывод в ваш интерфейс
- *							должна иметь сигнатуру fcn(const char*, ...) (аналог printf)
- *	PutChar				- функция реализующая вывод 1 символа в ваш интерфейс
- *							должна иметь сигнатуру fcn(char) [требуется для echo]
- *
- *	Настройка времени:
- *	Временные отсчеты помещать в переменную с данным именем uint32_t SysTickCtr;
- *
- *	Переопределить макрос "Terminal_GetMs", чтобы он возвращал отсчитанное
- *	время в милисекундах.
+ *			Terminal configure file
  *
  *	---------------------------------------------------------------------
  *
- *	Пример работы терминала в файле Readme.h
+ *	Examples in Readme.h file.
  *
  ************************************************************************/
 
@@ -37,48 +15,49 @@
 #include <stdint.h>
 #include <stdlib.h>				// strtol, itoa
 
-#define TERM_TIMELEFT_EN				(0)			// Расчет времени
-#define TERM_TX_RX_EN					(1)			// Интерфейс терминала
-#define TERM_TX_RX_DEB_EN				(1)			// Дополнительный отладочный интерфейс терминала
-#define TERM_CMD_LOG_EN					(1)			// Лог введеных команд
-#define TERM_LR_KEY_EN					(1)			// Перемещение каретки вправо-влево
-#define TERM_DEFAULT_ALLOC_EN			(1)			//
-#define TERM_DEFAULT_STRING_EN			(1)			//
-#define TERM_PRINT_ERROR_EXEC_EN		(1)			// 
-#define TERM_PRINT_ERROR_ADD_CMD_EN		(1)			// 
-
-// ******************************** keys ************************************
+// ****************************** Code keys ********************************
 
 #define _KEY_INIT(c)					((char)c)
 
-#define TERM_KEY_ENTER					(_KEY_INIT(0x0D))		// Символ ввода команды
-#define TERM_KEY_BACKSPACE				(_KEY_INIT(0x7F))		// Символ удаление последнего введеного символа
-#define TERM_KEY_ESCAPE					(_KEY_INIT(0xF0))		// Символ прерывание операции
-#define TERM_KEY_UP						(_KEY_INIT(0xF1))		//
-#define TERM_KEY_RIGHT					(_KEY_INIT(0xF2))		//
-#define TERM_KEY_DOWN					(_KEY_INIT(0xF3))		//
-#define TERM_KEY_LEFT					(_KEY_INIT(0xF4))		//
-#define TERM_KEY_RESET					'~'			// Символ сброса cpu	(shift+Ё)
+#define TERM_KEY_ENTER					(_KEY_INIT(0x0D))		// Enter command symbol
+#define TERM_KEY_BACKSPACE				(_KEY_INIT(0x7F))		// Delete character before cursor position
+#define TERM_KEY_ESCAPE					(_KEY_INIT(0xF0))		// Exception execute command symbol
+#define TERM_KEY_UP						(_KEY_INIT(0xF1))		// KeyUp symbol
+#define TERM_KEY_RIGHT					(_KEY_INIT(0xF2))		// KeyRight symbol
+#define TERM_KEY_DOWN					(_KEY_INIT(0xF3))		// KeyDown symbol
+#define TERM_KEY_LEFT					(_KEY_INIT(0xF4))		// KeyLeft symbol
+#define TERM_KEY_DEL					(_KEY_INIT(0xF5))		// Delete character after cursor position
+#define TERM_KEY_RESET					'~'						// Reset CPU
 
 // **************************************************************************
 
-// ********************** Настройки терминала *******************************
+// ********************** Terminal Settings *********************************
 
-#define _TERM_VER_				"v1.4"				// Версия терминала
-#define TERM_SIZE_TASK          (80)				// Максимальное количество задач
-#define TERM_CMD_BUF_SIZE		(80)				// Максимальное количество символов в буффере вводимых команд
-#define TERM_CMD_LOG_SIZE		(10)				// Лог последних введенных команд
-#define TERM_ARGS_BUF_SIZE		(20)				// Максимальное количество аргументов к команде
-#define TERM_ARG_SIZE			(15)				// Максиимальная длина одного аргумента
-#define CHAR_INTERRUPT			TERM_KEY_ESCAPE 	// Символ прерывания операции
-#define STRING_TERM_ENTER		"\n\r"				// Перенос строки
-#define STRING_TERM_ARROW		">> "				// Указатель ввода ввода
-#define ECHO_EN					(1)					// Включить echo
-#define RESET_FCN()					// Функция сброса процессора
+#define _TERM_VER_				"v1.4"				// Terminal version
+#define TERM_SIZE_TASK          (80)				// Max number of commands
+#define TERM_CMD_BUF_SIZE		(80)				// Max number of character buffer string command
+#define TERM_CMD_LOG_SIZE		(10)				// Max number of loging command
+#define TERM_ARGS_BUF_SIZE		(20)				// Max number of arguments in one command
+#define TERM_ARG_SIZE			(15)				// Max number character of one arguments
+#define CHAR_INTERRUPT			TERM_KEY_ESCAPE 	// Abort execute command key-code symbol
+#define STRING_TERM_ENTER		"\n\r"				// String new line
+#define STRING_TERM_ARROW		">> "				// String arrow enter
+#define RESET_FCN()									// Reset CPU Function
+
+#define TERM_TIMELEFT_EN				(0)			// Calculate time
+#define TERM_TX_RX_EN					(1)			// Terminal Printf (without this don,t work)
+#define TERM_TX_RX_DEB_EN				(1)			// Addition debug printf
+#define TERM_CMD_LOG_EN					(1)			// Command logging
+#define TERM_LR_KEY_EN					(1)			// Move cursor left-rigth
+#define TERM_DEFAULT_ALLOC_EN			(1)			// Default Memory Allocate functions
+#define TERM_DEFAULT_STRING_EN			(1)			// Default String functions
+#define TERM_PRINT_ERROR_EXEC_EN		(1)			// Print error after execute command
+#define TERM_PRINT_ERROR_ADD_CMD_EN		(1)			// Print error after added command
+#define ECHO_EN					(1)					// Enter echo enable
 
 // **************************************************************************
 
-// ********************** Настройки вывода в терминал ***********************
+// ************************* IO Terminal Settings ***************************
 
 #if (TERM_TX_RX_EN == 1)
 #include <stdio.h>
@@ -99,7 +78,7 @@ extern void COM_Putc(char c);
 #endif	// TERM_TX_RX_EN == 1
 // **************************************************************************
 
-// ************** Настройки дополнительного отладочного вывода **************
+// *********************** IO Debug Terminal Settings ***********************
 
 #if (TERM_TX_RX_DEB_EN == 1)
 #define CLI_DPrintf		printf
@@ -109,10 +88,11 @@ extern void COM_Putc(char c);
 
 // **************************************************************************
 
-// ************************ Настройки вывода времени ************************
+// ************************ Time calculate Settings *************************
 
 #if (TERM_TIMELEFT_EN == 1)
 
+	// yout implementation
 extern volatile uint64_t SysTickCtr;							// Переменная содержит счетчик тактов
 
 #define Terminal_GetUs()			((float)SysTickCtr * 10)	// Функция возвращающая системное время в us
@@ -129,7 +109,6 @@ extern volatile uint64_t SysTickCtr;							// Переменная содержит счетчик тактов
 #define Terminal_GetMs()			(0)
 #define SysTimeReset()				{}
 #define delay_ms(ms)				{}
-
 
 #endif	// TERM_TIMELEFT_EN == 1
 

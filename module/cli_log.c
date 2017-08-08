@@ -2,20 +2,19 @@
 
 struct{
 	char cmds[TERM_CMD_LOG_SIZE][TERM_CMD_BUF_SIZE];
-	uint32_t _curCmd;
-	uint32_t _cntCmd;
+	int8_t _curCmd;
+	int8_t _cntCmd;
 }TermLog;
 
 void CLI_LogInit()
 {
-    CLI_CurReset();
 	TermLog._cntCmd = 0;
-
-	for(uint32_t i = 0; i < TERM_CMD_LOG_SIZE; i++)
+    CLI_CurReset();
+	
+	for(uint8_t i = 0; i < TERM_CMD_LOG_SIZE; i++)
 	{
 		TermLog.cmds[i][0] = '\0';
 	}
-
 }
 
 void CLI_LogCmdPush(const char* cmd)
@@ -33,7 +32,7 @@ void CLI_LogCmdPush(const char* cmd)
 	}
 }
 
-const char* CLI_LogCmdGet(uint32_t index)
+const char* CLI_LogCmdGet(uint8_t index)
 {
 	if (index < TERM_CMD_LOG_SIZE)
 	{

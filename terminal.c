@@ -26,8 +26,6 @@ static uint8_t _cpurb_cmd(char** argv, uint8_t argc);
 
 extern CLI_Time_s _def_time;
 
-static void (*enter_callback)(uint8_t* rx_buf, uint16_t length);
-
 // ************************* interrupt function ***************************
 
 static bool _interrupt_operation = false;
@@ -98,20 +96,20 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
 
     CLI_SetTime(&_def_time, 0, 0, 0);
 
-    CLI_AddCmd("help", 		_help_cmd, 		"помощь по командам терминала");
+    CLI_AddCmd("help", 		_help_cmd, 		"help by terminal command");
     CLI_AddCmd("~", 		_reset_cpu, 	"reset cpu");
 
     if (defCmd & TDC_Time)
     {
-        CLI_AddCmd("settime", 	_settime_cmd, 	"задать текущее время\n\r\tsettime [h] [m] [s]");
-        CLI_AddCmd("gettime", 	_gettime_cmd, 	"вывести текущее время");
+        CLI_AddCmd("settime", 	_settime_cmd, 	"set current time\n\r\tsettime [h] [m] [s]");
+        CLI_AddCmd("gettime", 	_gettime_cmd, 	"print current time");
     }
 
     if (defCmd & TDC_CPU)
     {
-        CLI_AddCmd("cpur", 		_cpur_cmd, 		"прочитать из адреса процессора\n\r\tcpur [addr]\n\r\t\taddr - 32-разрядное значение адреса, из которого читать");
-        CLI_AddCmd("cpuw", 		_cpuw_cmd, 		"записать по адресу процессора\n\r\tcpuw [addr] [data]\n\r\t\taddr - 32-разрядное значение адреса, из которого читать\n\r\t\tdata - 32-разрядное значение записываемых данных");
-        CLI_AddCmd("cpurb", 	_cpurb_cmd,		"прочитать блок из процессора начиная с адреса\n\r\tcpurb [addr] [length]\n\r\t\taddr - 32-разрядное значение адреса, из которого начинать чтение\n\r\t\tlength - количество читаемыхх регистров");
+        CLI_AddCmd("cpur", 		_cpur_cmd, 		"read from CPU reg\n\r\tcpur [addr]\n\r\t\taddr - 32-разрядное значение адреса, из которого читать");
+        CLI_AddCmd("cpuw", 		_cpuw_cmd, 		"write in CPU reg\n\r\tcpuw [addr] [data]\n\r\t\taddr - 32-разрядное значение адреса, из которого читать\n\r\t\tdata - 32-разрядное значение записываемых данных");
+        CLI_AddCmd("cpurb", 	_cpurb_cmd,		"read block from CPU\n\r\tcpurb [addr] [length]\n\r\t\taddr - 32-разрядное значение адреса, из которого начинать чтение\n\r\t\tlength - количество читаемыхх регистров");
     }
 
     CLI_Printf("\r\nCount base command: %d", Terminal.countCommand);
@@ -134,12 +132,12 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
 #define CLI_GetDecString(str)        ((uint32_t) strtoll((const char*)str, NULL, 10))
 #define CLI_GetHexString(str)        ((uint32_t) strtoll((const char*)str, NULL, 16))
 
-uint32_t CLI_GetArgDec(uint8_t index)
+inline uint32_t CLI_GetArgDec(uint8_t index)
 {
 	return CLI_GetDecString(Terminal.input_args.argv[index + 1]);
 }
 
-uint32_t CLI_GetArgHex(uint8_t index)
+inline uint32_t CLI_GetArgHex(uint8_t index)
 {
 	return CLI_GetHexString(Terminal.input_args.argv[index + 1]);
 }
@@ -609,6 +607,10 @@ static void _RemChar()
 /// \return {TC_Result_e} - результат операции добавления символа
 TC_Result_e CLI_EnterChar(char c)
 {
+	static bool rstUnlock = false;
+	if(rstUnlock && (c != TERM_KEY_RESET))
+		rstUnlock = false;
+	
 	/*
 	uint8_t* write_buffer = (uint8_t*)Terminal.buf_enter;
 	int16_t* write_cntr = &Terminal.buf_cntr;
@@ -627,12 +629,13 @@ TC_Result_e CLI_EnterChar(char c)
 	{TerminalTx("%02X ",*((char*) (Terminal.symbols.ptrObj + i)));}
 	 */
 
-	uint8_t arr_up[] = {0x1B, 0x5B, 0x41};
-	uint8_t arr_down[] = {0x1B, 0x5B, 0x42};
+	uint8_t arr_up[]	= {0x1B, 0x5B, 0x41};
+	uint8_t arr_down[]	= {0x1B, 0x5B, 0x42};
 	uint8_t arr_right[] = {0x1B, 0x5B, 0x43};
-	uint8_t arr_left[] = {0x1B, 0x5B, 0x44};
-	uint8_t arr_esc[] = {0x1B, 0x1B, 0x1B};
-
+	uint8_t arr_left[]	= {0x1B, 0x5B, 0x44};
+	uint8_t arr_esc[]	= {0x1B, 0x1B, 0x1B};
+	uint8_t del[]		= {0x1B, 0x5B, 0x33};
+	
 	if (Q_IsEqual(&Terminal.symbols, arr_up, 3))
 		{c = TERM_KEY_UP;}
 	else if (Q_IsEqual(&Terminal.symbols, arr_down, 3))
@@ -643,7 +646,9 @@ TC_Result_e CLI_EnterChar(char c)
 		{c = TERM_KEY_LEFT;}
 	else if (Q_IsEqual(&Terminal.symbols, arr_esc, 3))
 		{c = TERM_KEY_ESCAPE;}
-
+	else if (Q_IsEqual(&Terminal.symbols, del, 3))
+		{c = TERM_KEY_DEL;}
+	
 	bool isValidKey = ((Terminal.buf_cntr < TERM_CMD_BUF_SIZE) ||
 						(c == TERM_KEY_BACKSPACE) ||
 						(c == TERM_KEY_ENTER)	||
@@ -654,6 +659,7 @@ TC_Result_e CLI_EnterChar(char c)
 						((c > 0x40) && (c < 0x5B)) ||
 						(c == 0x20) || (c == '_') || (c == '-'));
 
+	// TODO запихать проверку на выполнение команды и запрет ввода
 #if 0
     CLI_DPrintf("\r\nKey Code: 0x%02X", c);
 #endif
@@ -667,11 +673,6 @@ TC_Result_e CLI_EnterChar(char c)
 				
 				Terminal.buf_enter[Terminal.buf_cntr] = '\0';
 				cli_memcpy(Terminal.buf_transit, Terminal.buf_enter, Terminal.buf_cntr + 1);
-				
-				if (enter_callback != NULL)
-				{
-					enter_callback((uint8_t*)Terminal.buf_enter, (uint16_t)Terminal.buf_cntr + 1);
-				}	
 
 #if (TERM_CMD_LOG_EN == 1)
 				CLI_LogCmdPush(Terminal.buf_enter);
@@ -685,7 +686,17 @@ TC_Result_e CLI_EnterChar(char c)
 			}break;
 			case CHAR_INTERRUPT:		{_interrupt_operation = true;CLI_Printf("\r\nKey ESC");}break;
 			case TERM_KEY_BACKSPACE:	{if (Terminal.buf_curPos > 0){_RemChar();}}break;
-			case TERM_KEY_RESET:		{return TC_Reset;}break;
+			case TERM_KEY_RESET:
+			{
+				if(rstUnlock)
+				{
+					return TC_Reset;
+				}
+				else
+				{
+					rstUnlock = true;
+				}
+			}break;
 			case TERM_KEY_DOWN:
 			{
 #if (TERM_CMD_LOG_EN == 1)
@@ -721,6 +732,18 @@ TC_Result_e CLI_EnterChar(char c)
 					Terminal.buf_curPos++;
 				}
 #endif
+			}break;
+			case TERM_KEY_DEL:
+			{
+				if ((Terminal.buf_curPos != Terminal.buf_cntr) && (Terminal.buf_cntr != 0))
+				{
+					Terminal.buf_curPos++;
+					if(Terminal.buf_curPos == Terminal.buf_cntr)
+					{
+						PutChar(Terminal.buf_enter[Terminal.buf_curPos - 1]);
+					}
+					_RemChar();
+				}
 			}break;
 			default:
 			{
