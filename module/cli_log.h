@@ -10,7 +10,7 @@
 void CLI_LogInit();
 
 void CLI_LogCmdPush(const char* cmd);
-const char* CLI_LogCmdGet(uint32_t index);
+const char* CLI_LogCmdGet(uint8_t index);
 
 const char* CLI_GetNextCmd();
 const char* CLI_GetLastCmd();

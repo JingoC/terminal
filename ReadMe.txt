@@ -10,6 +10,12 @@
 #include "terminal_config.h"
 #include "terminal.h"
 
+void ReceiveControl()
+{
+	if (COM_Recieve(&c))
+	    CLI_EnterChar(c);	// Entered character in Terminal
+}
+
 uint8_t _t1_cmd()
 {	
 	uint32_t a = 0x01;
@@ -17,7 +23,7 @@ uint8_t _t1_cmd()
 	uint32_t c = 7;
 	
 	// be sure arguments
-	c = CLI_GetDecString(0);
+	c = CLI_GetArgDec(0);
 	
 	// optional arguments
 	CLI_GetArgHexByFlag("-a", &a);
@@ -32,6 +38,7 @@ uint8_t _t2_cmd()
 {
 	while(1)
 	{
+		ReceiveControl();
 		CLI_RetInt();
 	}
 	
@@ -46,16 +53,14 @@ int main(int argc, char *argv[]) {
 		CLI_Init(TDC_Time);
 		
 		// Add Terminal Command
-		CLI_AddCmd("t1", _t1_cmd, 1, TMC_PrintStartTime | TMC_PrintStopTime"t1 - description command");
-		CLI_AddCmd("t2", _t2_cmd, 1, TMC_PrintDiffTime, "t2 - description command");
+		CLI_AddCmd("t1", _t1_cmd, 1, TMC_PrintStartTime | TMC_PrintStopTime, "t1 - description command");
+		CLI_AddCmd("t2", _t2_cmd, 0, TMC_PrintDiffTime, "t2 - description command");
 	
 		char c;
 		while(1)
 		{
-	        if (COM_Recieve(&c))
-	        	CLI_EnterChar(c);	// Entered character in Terminal
-			
-			CLI_Execute();	// Execute command
+	        ReceiveControl();
+			CLI_Execute();		// Execute command
 	    }
 	}
 	

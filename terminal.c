@@ -13,16 +13,19 @@ void _PrintResultAddCmd(uint8_t code);
 void _PrintTime(CLI_Time_s* time);
 int8_t _IndexOfFlag(const char* flag);
 
+void CLI_PrintTime();
+void CLI_PrintTimeWithoutRN();
+
 extern uint8_t _strcmp(const char* str1, const char* str2);
 extern uint32_t _strlen(const char* strSrc);
 
-static uint8_t _help_cmd(char** argv, uint8_t argc);
-static uint8_t _reset_cpu(char** argv, uint8_t argc);
-static uint8_t _settime_cmd(char** argv, uint8_t argc);
-static uint8_t _gettime_cmd(char** argv, uint8_t argc);
-static uint8_t _cpur_cmd(char** argv, uint8_t argc);
-static uint8_t _cpuw_cmd(char** argv, uint8_t argc);
-static uint8_t _cpurb_cmd(char** argv, uint8_t argc);
+static uint8_t _help_cmd();
+static uint8_t _reset_cpu();
+static uint8_t _settime_cmd();
+static uint8_t _gettime_cmd();
+static uint8_t _cpur_cmd();
+static uint8_t _cpuw_cmd();
+static uint8_t _cpurb_cmd();
 
 extern CLI_Time_s _def_time;
 
@@ -96,20 +99,20 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
 
     CLI_SetTime(&_def_time, 0, 0, 0);
 
-    CLI_AddCmd("help", 		_help_cmd, 		"help by terminal command");
-    CLI_AddCmd("~", 		_reset_cpu, 	"reset cpu");
+    CLI_AddCmd("help", 		_help_cmd, 		0, TMC_None, "help by terminal command");
+    CLI_AddCmd("~", 		_reset_cpu, 	0, TMC_None, "reset cpu");
 
     if (defCmd & TDC_Time)
     {
-        CLI_AddCmd("settime", 	_settime_cmd, 	"set current time\n\r\tsettime [h] [m] [s]");
-        CLI_AddCmd("gettime", 	_gettime_cmd, 	"print current time");
+        CLI_AddCmd("settime", 	_settime_cmd, 	3, TMC_None, "set current time\n\r\tsettime [h] [m] [s]");
+        CLI_AddCmd("gettime", 	_gettime_cmd, 	0, TMC_None, "print current time");
     }
 
     if (defCmd & TDC_CPU)
     {
-        CLI_AddCmd("cpur", 		_cpur_cmd, 		"read from CPU reg\n\r\tcpur [addr]\n\r\t\taddr - 32-разрядное значение адреса, из которого читать");
-        CLI_AddCmd("cpuw", 		_cpuw_cmd, 		"write in CPU reg\n\r\tcpuw [addr] [data]\n\r\t\taddr - 32-разрядное значение адреса, из которого читать\n\r\t\tdata - 32-разрядное значение записываемых данных");
-        CLI_AddCmd("cpurb", 	_cpurb_cmd,		"read block from CPU\n\r\tcpurb [addr] [length]\n\r\t\taddr - 32-разрядное значение адреса, из которого начинать чтение\n\r\t\tlength - количество читаемыхх регистров");
+        CLI_AddCmd("cpur", 		_cpur_cmd, 		1, TMC_None, "read from CPU reg\n\r\tcpur [addr]\n\r\t\taddr - 32-разрядное значение адреса, из которого читать");
+        CLI_AddCmd("cpuw", 		_cpuw_cmd, 		2, TMC_None, "write in CPU reg\n\r\tcpuw [addr] [data]\n\r\t\taddr - 32-разрядное значение адреса, из которого читать\n\r\t\tdata - 32-разрядное значение записываемых данных");
+        CLI_AddCmd("cpurb", 	_cpurb_cmd,		2, TMC_None, "read block from CPU\n\r\tcpurb [addr] [length]\n\r\t\taddr - 32-разрядное значение адреса, из которого начинать чтение\n\r\t\tlength - количество читаемыхх регистров");
     }
 
     CLI_Printf("\r\nCount base command: %d", Terminal.countCommand);
@@ -249,7 +252,7 @@ bool CLI_Execute()
 /// \param {uint8_t (*)(char**, uint8_t)} fcn - функция обработчик команды
 /// \param {const char*} descr - описание команды (для команды help)
 /// \return {TA_Result_e} - результат попытки добавить команду
-TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(char**, uint8_t), const char* descr)
+TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(), uint8_t argc, uint16_t mode, const char* descr)
 {
     if (Terminal.countCommand >= TERM_SIZE_TASK)
 	{
@@ -280,6 +283,8 @@ TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(char**, uint8_t), const 
     uint8_t countCmd = Terminal.countCommand;
     Terminal.cmds[countCmd].fcn = fcn;
     Terminal.cmds[countCmd].name = name;
+    Terminal.cmds[countCmd].argc = argc;
+    Terminal.cmds[countCmd].mode = mode;
     Terminal.cmds[countCmd].description = descr;
     Terminal.countCommand++;
 
@@ -362,7 +367,7 @@ TermCmd* _findTermCmd(const char* cmdName)
 
 // ************************* sys cmd terminal *****************************
 
-uint8_t _help_cmd(char** argv, uint8_t argc)
+uint8_t _help_cmd()
 {
     CLI_Printf("\r\nCount command: %d", (int) Terminal.countCommand);
     CLI_Printf("\r\n[] - обязательный аргумент\r\n<> - не обязательный аргумент\r\n| - выбор между аргументами");
@@ -375,21 +380,18 @@ uint8_t _help_cmd(char** argv, uint8_t argc)
 	return TE_OK;
 }
 
-uint8_t _reset_cpu(char** argv, uint8_t argc)
+uint8_t _reset_cpu()
 {
 	RESET_FCN();
 
 	return TE_OK;
 }
 
-uint8_t _settime_cmd(char** argv, uint8_t argc)
+uint8_t _settime_cmd()
 {
-	if (argc < 4)
-		return TE_ArgErr;
-
-    uint32_t h = CLI_GetDecString(argv[1]);
-    uint8_t m = CLI_GetDecString(argv[2]);
-    uint8_t s = CLI_GetDecString(argv[3]);
+    uint32_t h = CLI_GetArgDec(0);
+    uint8_t m = CLI_GetArgDec(1);
+    uint8_t s = CLI_GetArgDec(2);
 
 	SysTimeReset();
 
@@ -398,7 +400,7 @@ uint8_t _settime_cmd(char** argv, uint8_t argc)
 	return TE_OK;
 }
 
-uint8_t _gettime_cmd(char** argv, uint8_t argc)
+uint8_t _gettime_cmd()
 {
     CLI_Printf("\r\nTime: ");
     CLI_PrintTime();
@@ -406,26 +408,20 @@ uint8_t _gettime_cmd(char** argv, uint8_t argc)
 	return TE_OK;
 }
 
-uint8_t _cpur_cmd(char** argv, uint8_t argc)
+uint8_t _cpur_cmd()
 {
-	if (argc < 2)
-		return TE_ArgErr;
-
-    uint32_t* v = (uint32_t*) CLI_GetHexString(argv[1]);
+    uint32_t addr = CLI_GetArgHex(0);
+    uint32_t* v = (uint32_t*) addr;
 
     CLI_Printf("\r\n0x%08X: 0x%08X", (uint32_t) v, (uint32_t) *v);
 
 	return TE_OK;
 }
 
-uint8_t _cpuw_cmd(char** argv, uint8_t argc)
+uint8_t _cpuw_cmd()
 {
-	if (argc < 3)
-		return TE_ArgErr;
-
-
-    uint32_t* v = (uint32_t*) (uint32_t) CLI_GetHexString(argv[1]);
-    uint32_t d = CLI_GetHexString(argv[2]);
+    uint32_t* v = (uint32_t*) CLI_GetArgHex(0);
+    uint32_t d = CLI_GetArgHex(1);
 	*v = d;
 
     CLI_Printf("\r\n0x%08X: 0x%08X", (int) v, (int) *v);
@@ -433,13 +429,10 @@ uint8_t _cpuw_cmd(char** argv, uint8_t argc)
 	return TE_OK;
 }
 
-uint8_t _cpurb_cmd(char** argv, uint8_t argc)
+uint8_t _cpurb_cmd()
 {
-	if (argc < 3)
-		return TE_ArgErr;
-
-    uint32_t* v = (uint32_t*) CLI_GetHexString(argv[1]);
-    uint32_t c = CLI_GetDecString(argv[2]);
+    uint32_t* v = (uint32_t*) CLI_GetArgHex(0);
+    uint32_t c = CLI_GetArgDec(1);
 
 	for(uint32_t i = 0; i < c; i++)
 	{
@@ -453,9 +446,9 @@ uint8_t _cpurb_cmd(char** argv, uint8_t argc)
 
 // ************************************************************************
 
-void _PrintTime(CLI_Time_s* time)
+void _PrintTime(CLI_Time_s* t)
 {
-	CLI_Printf("\r\n%02d:%02d:%02d.%03d", (int) t.hour, (int) t.minute, (int) t.second, (int) t.msec);
+	CLI_Printf("\r\n%02d:%02d:%02d.%03d", (int) t->hour, (int) t->minute, (int) t->second, (int) t->msec);
 }
 
 /// \brief Вывод текущего времени в терминал
@@ -464,7 +457,7 @@ void CLI_PrintTime()
 {
 	uint32_t ms = Terminal_GetMs();
     CLI_Time_s t = CLI_GenerateTimeMSec(CLI_GetTimeMSec(&_def_time) + ms);
-    _PrintTime(&t)
+    _PrintTime(&t);
 }
 
 /// \brief Вывод текущего времени в терминал без перевода строки
@@ -473,7 +466,7 @@ void CLI_PrintTimeWithoutRN()
 {
 	uint32_t ms = Terminal_GetMs();
     CLI_Time_s t = CLI_GenerateTimeMSec(CLI_GetTimeMSec(&_def_time) + ms);
-	_PrintTime(&t)
+	_PrintTime(&t);
 }
 
 static void _UpdateCmd(const char* newCmd)
@@ -740,7 +733,7 @@ TC_Result_e CLI_EnterChar(char c)
 					Terminal.buf_curPos++;
 					if(Terminal.buf_curPos == Terminal.buf_cntr)
 					{
-						PutChar(Terminal.buf_enter[Terminal.buf_curPos - 1]);
+						CLI_PutChar(Terminal.buf_enter[Terminal.buf_curPos - 1]);
 					}
 					_RemChar();
 				}
@@ -760,12 +753,4 @@ TC_Result_e CLI_EnterChar(char c)
 	}
 
 	return TC_OK;
-}
-
-/// \brief Задать функцию обработчик новой команды
-/// \param {(*)(uint8_t, uint16_t)} - фукнция обработчик
-/// \return none
-void CLI_SetEnterCallback(void (*fcn)(uint8_t* rx_buf, uint16_t length))
-{
-	enter_callback = fcn;
 }

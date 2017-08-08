@@ -34,7 +34,7 @@ bool CLI_GetIntState();
 
 void CLI_Init(TypeDefaultCmd_e defCmd);
 TA_Result_e CLI_AddCmd(const char* name, 
-						uint8_t (*fcn)(char**, uint8_t), 
+						uint8_t (*fcn)(), 
 						uint8_t argc, 
 						uint16_t mode, 
 						const char* descr);
