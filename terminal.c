@@ -413,7 +413,7 @@ uint8_t _cpur_cmd()
     uint32_t addr = CLI_GetArgHex(0);
     uint32_t* v = (uint32_t*)(intptr_t) addr;
 
-    CLI_Printf("\r\n0x%08X: 0x%08X", (uint32_t)(intptr_t) v, (uint32_t) *v);
+    CLI_Printf("\r\n0x%08X: 0x%08X", (int)(intptr_t) v, (int) *v);
 
 	return TE_OK;
 }
@@ -424,8 +424,6 @@ uint8_t _cpuw_cmd()
     uint32_t d = CLI_GetArgHex(1);
 	*v = d;
 
-    CLI_Printf("\r\n0x%08X: 0x%08X", (int32_t)(intptr_t) v, (int) *v);
-
 	return TE_OK;
 }
 
@@ -434,10 +432,9 @@ uint8_t _cpurb_cmd()
     uint32_t* v = (uint32_t*)(intptr_t) CLI_GetArgHex(0);
     uint32_t c = CLI_GetArgDec(1);
 
-	intptr_t f;
 	for(uint32_t i = 0; i < c; i++)
 	{
-        CLI_Printf("\r\n0x%08X: 0x%08X", (int32_t)(intptr_t) v, (int32_t) *v);
+        CLI_Printf("\r\n0x%08X: 0x%08X", (int)(intptr_t) v, (int) *v);
 		v++;
 	}
 
