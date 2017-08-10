@@ -42,6 +42,8 @@ TA_Result_e CLI_AddCmd(const char* name,
 TC_Result_e CLI_EnterChar(char c);
 bool CLI_Execute();
 
+bool CLI_IsArgFlag(const char* flag);
+
 bool CLI_GetArgDecByFlag(const char* flag, uint32_t* outValue);
 bool CLI_GetArgHexByFlag(const char* flag, uint32_t* outValue);
 

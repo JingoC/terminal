@@ -169,6 +169,11 @@ bool CLI_GetArgHexByFlag(const char* flag, uint32_t* outValue)
 	return false;
 }
 
+bool CLI_IsArgFlag(const char* flag)
+{
+	return _IndexOfFlag(flag) >= 0;
+}
+
 /// \brief Выполнить команду
 /// \param {char*} argv - аргументы (комманда и аттрибуты)
 /// \param {uint8_t} argc - количество аргументов
