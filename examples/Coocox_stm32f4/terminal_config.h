@@ -20,7 +20,7 @@
 #define _KEY_INIT(c)					((char)c)
 
 #define TERM_KEY_ENTER					(_KEY_INIT(0x0D))		// Enter command symbol
-#define TERM_KEY_BACKSPACE				(_KEY_INIT(0x7F))		// Delete character before cursor position
+#define TERM_KEY_BACKSPACE				(_KEY_INIT(0x08))		// Delete character before cursor position
 #define TERM_KEY_ESCAPE					(_KEY_INIT(0xF0))		// Exception execute command symbol
 #define TERM_KEY_UP						(_KEY_INIT(0xF1))		// KeyUp symbol
 #define TERM_KEY_RIGHT					(_KEY_INIT(0xF2))		// KeyRight symbol
@@ -33,6 +33,7 @@
 
 // ********************** Terminal Settings *********************************
 
+extern void _reset_fcn();
 #define _TERM_VER_				"v1.4"				// Terminal version
 #define TERM_SIZE_TASK          (80)				// Max number of commands
 #define TERM_CMD_BUF_SIZE		(80)				// Max number of character buffer string command
@@ -42,7 +43,7 @@
 #define CHAR_INTERRUPT			TERM_KEY_ESCAPE 	// Abort execute command key-code symbol
 #define STRING_TERM_ENTER		"\n\r"				// String new line
 #define STRING_TERM_ARROW		">> "				// String arrow enter
-#define RESET_FCN()									// Reset CPU Function
+#define RESET_FCN				_reset_fcn			// Reset CPU Function
 
 #define TERM_TIMELEFT_EN				(1)			// Calculate time
 #define TERM_TX_RX_EN					(1)			// Terminal Printf (without this don,t work)

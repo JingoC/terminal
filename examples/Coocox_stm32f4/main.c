@@ -1,6 +1,10 @@
 #include "global_inc.h"
 
 #include "stm32f4xx.h"
+
+#include "core_cm4.h"
+#include "core_cmFunc.h"
+
 #include "system_stm32f4xx.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_usart.h"
@@ -13,12 +17,18 @@
 
 char dbgbuffer[256];
 
-#define TERMINAL_USART			USART1
+#define TERMINAL_USART			USART3
+#define TERMINAL_GPIO			GPIOD
+
+void _reset_fcn()
+{
+	NVIC_SystemReset();
+}
 
 inline void TUSART_PutChar(char c)
 {
+	while (!USART_GetFlagStatus(TERMINAL_USART, USART_FLAG_TXE));
 	USART_SendData(TERMINAL_USART, c);
-	while(USART_GetFlagStatus(TERMINAL_USART, USART_FLAG_TXE) != SET){}
 }
 
 void TUSART_Print(const char* str)
@@ -35,33 +45,41 @@ void TUSART_Print(const char* str)
 
 void _InitHW()
 {
-	SystemInit();
 	SystemCoreClockUpdate();
 
-	RCC_APB1PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
 	GPIO_InitTypeDef gpio;
 	gpio.GPIO_Mode = GPIO_Mode_AF;
-	gpio.GPIO_OType = GPIO_OType_OD;
-	gpio.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
-	gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	gpio.GPIO_OType = GPIO_OType_PP;
+	gpio.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
+	gpio.GPIO_PuPd = GPIO_PuPd_UP;
 	gpio.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_Init(GPIOA, &gpio);
+	GPIO_Init(TERMINAL_GPIO, &gpio);
+
+	GPIO_PinAFConfig(TERMINAL_GPIO, GPIO_PinSource8, GPIO_AF_USART3);
+	GPIO_PinAFConfig(TERMINAL_GPIO, GPIO_PinSource9, GPIO_AF_USART3);
 
 	USART_InitTypeDef usart;
-	usart.USART_BaudRate = 115200;
+	usart.USART_BaudRate = 9600;
 	usart.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-	usart.USART_WordLength = USART_WordLength_8b;
-	usart.USART_StopBits = USART_StopBits_1;
 	usart.USART_Parity = USART_Parity_No;
 	usart.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART_Init(USART1, &usart);
+	usart.USART_StopBits = USART_StopBits_1;
+	usart.USART_WordLength = USART_WordLength_8b;
+
+	USART_Init(TERMINAL_USART, &usart);
+
+	USART_Cmd(TERMINAL_USART, ENABLE);
+	USART_ITConfig(TERMINAL_USART, USART_IT_RXNE, ENABLE);
 
 	SysTick_Config(SystemCoreClock / 100000);
 
-	NVIC_EnableIRQ(USART1_IRQn);
+	NVIC_EnableIRQ(USART3_IRQn);
 	NVIC_EnableIRQ(SysTick_IRQn);
+
+	__enable_irq();
 }
 
 void _InitSW()
@@ -82,9 +100,10 @@ int main(void)
     }
 }
 
-void USART1_IRQHandler()
+void USART3_IRQHandler()
 {
-	CLI_EnterChar(USART_ReceiveData(USART1));
+	USART_ClearITPendingBit(TERMINAL_USART, USART_IT_RXNE);
+	CLI_EnterChar(USART_ReceiveData(TERMINAL_USART));
 }
 
 volatile uint64_t SysTickCtr = 0;

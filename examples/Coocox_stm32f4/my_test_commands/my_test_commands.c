@@ -34,6 +34,7 @@ uint8_t _t1_cmd()
 
 uint8_t _t2_cmd()
 {
+	CLI_Printf("\r\nPress ESC");
 	while(1)
 	{
 		CLI_RetInt();

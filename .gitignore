@@ -3,3 +3,4 @@
 /examples/Coocox_stm32f4/stm32f4_terminal_example/Debug/bin/stm32f4_terminal_example.map
 /examples/Coocox_stm32f4/stm32f4_terminal_example/Debug/obj/history.xml
 /examples/Coocox_stm32f4/stm32f4_terminal_example/stm32f4_terminal_example.elf.xcodeproj/*.pbxproj
+/examples/Coocox_stm32f4/stm32f4_terminal_example/Debug/obj/dependencies.xml

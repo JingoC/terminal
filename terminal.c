@@ -686,6 +686,7 @@ TC_Result_e CLI_EnterChar(char c)
 			{
 				if(rstUnlock)
 				{
+					RESET_FCN();
 					return TC_Reset;
 				}
 				else
