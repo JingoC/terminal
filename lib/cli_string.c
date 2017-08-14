@@ -7,11 +7,7 @@ uint8_t _strcmp(const char* str1, const char* str2);
 uint32_t _strlen(const char* strSrc);
 uint16_t _getCountSeparator(const char* str, const char* separator);
 
-/// \brief –азбиение строки по заданому сепаратору
-/// \param {char*} strSrc - исходна€ строка
-/// \param {const char*} separator - каждый символ строки €вл€етс€ сепаратором
-/// \param {args*} dst - буфер результата выполнени€ операции
-/// \return none
+/// \brief Splitting a string by a given separator
 void split(char* strSrc, const char* separator, args* dst)
 {
     uint8_t count_sep = _getCountSeparator(strSrc, separator);
@@ -52,8 +48,7 @@ void split(char* strSrc, const char* separator, args* dst)
     }
 }
 
-/// \brief ќсвобождение пам€ти, выделенной под структуру
-/// \param {args*} src - указатель на структуру, дл€ которой будет применена операци€
+/// \brief free memory
 /// \return none
 void ArgDestroy(args* src)
 {

@@ -2,9 +2,7 @@
 
 CLI_Time_s _def_time;
 
-/// \brief Получить время в TTime из милисекунд
-/// \param {uint32_t} msec - время в милисекундах
-/// \return {TTime} - время
+/// \brief Generate CLI_Time_s struct from milliseconds
 CLI_Time_s CLI_GenerateTimeMSec(uint32_t msec)
 {
     CLI_Time_s res;
@@ -19,9 +17,7 @@ CLI_Time_s CLI_GenerateTimeMSec(uint32_t msec)
 	return res;
 }
 
-/// \brief Получить время в TTime из секунд
-/// \param {uint32_t} sec - время в секундах
-/// \return {TTime} - время
+/// \brief Generate CLI_Time_s struct from seconds
 CLI_Time_s CLI_GenerateTime(uint32_t sec)
 {
     CLI_Time_s res;
@@ -35,18 +31,14 @@ CLI_Time_s CLI_GenerateTime(uint32_t sec)
 	return res;
 }
 
-/// \brief Получить время в секундах из структуры
-/// \param {TTime*} t - время
-/// \return {uint32_t} - время в секундах
+/// \brief Get seconds from CLI_Time_s
 inline uint32_t CLI_GetTime(CLI_Time_s* t)
 {
 	uint32_t sec = t->hour * 3600 + t->minute * 60 + t->second;
 	return sec;
 }
 
-/// \brief Получить время в милисекундах из структуры
-/// \param {TTime*} t - время
-/// \return {uint32_t} - время в милисекундах
+/// \brief Get milliseconds from CLI_Time_s
 inline uint32_t CLI_GetTimeMSec(CLI_Time_s* t)
 {
 	uint32_t sec = t->hour * 3600000 + t->minute * 60000 + t->second * 1000 + t->msec;

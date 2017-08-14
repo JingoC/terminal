@@ -5,7 +5,7 @@
 #include "module/cli_time.h"
 #include "module/cli_log.h"
 
-#define printArrow()			{CLI_Printf(STRING_TERM_ENTER);CLI_Printf(STRING_TERM_ARROW);}	// вывод символов указывающих на ввод
+#define printArrow()			{CLI_Printf(STRING_TERM_ENTER);CLI_Printf(STRING_TERM_ARROW);}	// Output of input line
 #define printArrowWithoutN()	{CLI_Printf(STRING_TERM_ARROW);}
 
 void _PrintResultExec(uint8_t code);
@@ -33,8 +33,7 @@ extern CLI_Time_s _def_time;
 
 static bool _interrupt_operation = false;
 
-/// \brief Проверка статуса прерывания операции (после чтения, статус очищается)
-/// \return {bool} - true: требуется прервать операцию
+/// \brief Checking the status of the start of the operation (return, stator-on)
 inline bool CLI_GetIntState(){
 
 	bool res = _interrupt_operation;
@@ -46,33 +45,34 @@ inline bool CLI_GetIntState(){
 
 // *********************** Terminal fcns **********************************
 
+/// \brief Command settings
 typedef struct{
-    uint8_t (*fcn)();			// Функция обработчик комманды
-    const char* name;			// Имя команды, по которой вызывается функция
-	uint8_t argc;				// 
-	uint16_t mode;				// 
-	const char* description;	// Описание команды (аргументы, описание действия и т.п.)
-}TermCmd;		// Структура описывает команду терминала
+    uint8_t (*fcn)();			// callback function command
+    const char* name;			// name command
+	uint8_t argc;				// min count argument
+	uint16_t mode;				// mode execute command
+	const char* description;	// description command
+}TermCmd_s;
 
+/// \brief Terminal State
 struct{
-	Queue_s symbols;							// очередь символов введенных последовательно
-	char buf_transit[TERM_CMD_BUF_SIZE + 1];	//
-	char buf_enter[TERM_CMD_BUF_SIZE + 1];		// Буфер ввода
-	char buf_enter_exec[TERM_CMD_BUF_SIZE + 1];	// Буфер ввода, при запущенной задачи
-	int16_t buf_curPos;							// Текущая позиция курсора
-	int16_t buf_cntr;							// Счетчика буфера ввода
-	int16_t buf_cntr_exec;						// Счетчика буфера ввода при запущенной задаче
-    TermCmd cmds[TERM_SIZE_TASK];				// Команды терминала
-    uint8_t countCommand;						// Количество команд
-    uint8_t executeState;						// Состояние терминала (запущена задача или нет)
-    volatile args input_args;
+	Queue_s symbols;							// queue symbols input
+	char buf_transit[TERM_CMD_BUF_SIZE + 1];	// transit buffer
+	char buf_enter[TERM_CMD_BUF_SIZE + 1];		// input buffer
+	char buf_enter_exec[TERM_CMD_BUF_SIZE + 1];	// input buffer in execute command
+	int16_t buf_curPos;							// current cursos position
+	int16_t buf_cntr;							// current count input symbols
+	int16_t buf_cntr_exec;						// current count input symbols in execute command
+    TermCmd_s cmds[TERM_SIZE_TASK];				// list commands
+    uint8_t countCommand;						// count commands
+    uint8_t executeState;						// state terminal
+    volatile args input_args;					// args current execute command
     bool isEntered;								// 
 }Terminal;		// Терминал
 
-TermCmd* _findTermCmd(const char* cmdName);
+TermCmd_s* _findTermCmd(const char* cmdName);
 
-/// \brief Инициализация терминала
-/// \return none
+/// \brief Terminal initialize
 void CLI_Init(TypeDefaultCmd_e defCmd){
 
     CLI_Printf("\r\n****************************************************");
@@ -110,9 +110,9 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
 
     if (defCmd & TDC_CPU)
     {
-        CLI_AddCmd("cpur", 		_cpur_cmd, 		1, TMC_None, "read from CPU reg\n\r\tcpur [addr]\n\r\t\taddr - 32-разрядное значение адреса, из которого читать");
-        CLI_AddCmd("cpuw", 		_cpuw_cmd, 		2, TMC_None, "write in CPU reg\n\r\tcpuw [addr] [data]\n\r\t\taddr - 32-разрядное значение адреса, из которого читать\n\r\t\tdata - 32-разрядное значение записываемых данных");
-        CLI_AddCmd("cpurb", 	_cpurb_cmd,		2, TMC_None, "read block from CPU\n\r\tcpurb [addr] [length]\n\r\t\taddr - 32-разрядное значение адреса, из которого начинать чтение\n\r\t\tlength - количество читаемыхх регистров");
+        CLI_AddCmd("cpur", 		_cpur_cmd, 		1, TMC_None, "read from CPU reg\n\r\tcpur [addr]");
+        CLI_AddCmd("cpuw", 		_cpuw_cmd, 		2, TMC_None, "write in CPU reg\n\r\tcpuw [addr] [data]");
+        CLI_AddCmd("cpurb", 	_cpurb_cmd,		2, TMC_None, "read block from CPU\n\r\tcpurb [addr] [length]");
     }
 
     CLI_Printf("\r\nCount base command: %d", Terminal.countCommand);
@@ -174,16 +174,16 @@ bool CLI_IsArgFlag(const char* flag)
 	return _IndexOfFlag(flag) >= 0;
 }
 
-/// \brief Выполнить команду
-/// \param {char*} argv - аргументы (комманда и аттрибуты)
-/// \param {uint8_t} argc - количество аргументов
-/// \return {TE_Result_e} - Результат выполнения команды
+/// \brief Execute command
+/// \param argv argument strings
+/// \param argc count argument strings
+/// \return result execute command
 TE_Result_e _Execute(char** argv, uint8_t argc)
 {
     if (argc < 1)
         return TE_ArgErr;
 
-    TermCmd* cmd = _findTermCmd(argv[0]);
+    TermCmd_s* cmd = _findTermCmd(argv[0]);
 
     if (cmd != NULL){
 		
@@ -216,9 +216,9 @@ TE_Result_e _Execute(char** argv, uint8_t argc)
     return TE_NotFound;
 }
 
-/// \brief Выполнить команду
-/// \param {const char*} str - строка с командой и набором аттрибутов к ней
-/// \return {TE_Result_e} - Результат выполнения команды
+/// \brief Execute command
+/// \param str command const string include arguments
+/// \return result execute command
 TE_Result_e _ExecuteString(const char* str)
 {
 	split((char*)str, " ", (args*) &Terminal.input_args);
@@ -239,6 +239,7 @@ TE_Result_e _ExecuteString(const char* str)
 	return result;
 }
 
+/// \brief Execute command
 bool CLI_Execute()
 {
 	if (Terminal.isEntered == true)
@@ -252,11 +253,13 @@ bool CLI_Execute()
 	return false;
 }
 
-/// \brief Функция добавления команды в терминал
-/// \param {const char*} name - имя команды, по которой она будет выполняться в терминале
-/// \param {uint8_t (*)(char**, uint8_t)} fcn - функция обработчик команды
-/// \param {const char*} descr - описание команды (для команды help)
-/// \return {TA_Result_e} - результат попытки добавить команду
+/// \brief Add command
+/// \param name - input name
+/// \param fcn - callback function
+/// \param argc - min count arguments
+/// \param mode - execute mode
+/// \param descr - description
+/// \return result append command
 TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(), uint8_t argc, uint16_t mode, const char* descr)
 {
     if (Terminal.countCommand >= TERM_SIZE_TASK)
@@ -296,8 +299,8 @@ TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(), uint8_t argc, uint16_
     return TA_OK;
 }
 
-/// \brief Вывести результат выполнения команды в терминал
-/// \param {uint8_t} code - код результата выполнения команды
+/// \brief Print result execute command
+/// \param code - result code
 /// \return none
 void _PrintResultExec(uint8_t code)
 {
@@ -312,8 +315,8 @@ void _PrintResultExec(uint8_t code)
 	printArrow();
 }
 
-/// \brief Вывести результат выполнения команды в терминал
-/// \param {uint8_t} code - код результата выполнения команды
+/// \brief Print result add command action
+/// \param code - result code
 /// \return none
 void _PrintResultAddCmd(uint8_t code)
 {
@@ -328,9 +331,8 @@ void _PrintResultAddCmd(uint8_t code)
 #endif
 }
 
-/// \brief Проверка присутствия влага внутри команды
-/// \param {const char*} flag - искомый флаг (предусмотрено 2 типа флагов, с чертой ('-') перед флагом подразумевает наличие значения после флага, просто символический флаг, подразумевает осутствие значения.
-/// \return int8_t - в случае наличия флага, возвращает его индекс среди параметров, в ином случае вернется -1.
+/// \brief Get index coinciding args string or -1
+/// \param flag - searched string
 int8_t _IndexOfFlag(const char* flag)
 {
 	for(uint8_t i = 0; i < Terminal.input_args.argc; i++)
@@ -347,10 +349,9 @@ int8_t _IndexOfFlag(const char* flag)
 	return -1;
 }
 
-/// \brief Поиск команды среди имеющихся в терминале
-/// \param {const char*} cmdName - имя искомой команды
-/// \return {TermCmd*} - Результат поиска (NULL, если команда не найдена)
-TermCmd* _findTermCmd(const char* cmdName)
+/// \brief Search command by name
+/// \return Command pointer or NULL
+TermCmd_s* _findTermCmd(const char* cmdName)
 {
     uint8_t i = 0;
     for(; i < Terminal.countCommand; i++){
@@ -375,7 +376,7 @@ TermCmd* _findTermCmd(const char* cmdName)
 uint8_t _help_cmd()
 {
     CLI_Printf("\r\nCount command: %d", (int) Terminal.countCommand);
-    CLI_Printf("\r\n[] - обязательный аргумент\r\n<> - не обязательный аргумент\r\n| - выбор между аргументами");
+    CLI_Printf("\r\n[] - mandatory argument\r\n<> - optional argument\r\n| - choice between arguments");
 	uint16_t i = 1;
 	for(; i < Terminal.countCommand; i++){
         CLI_Printf("\r\n\n%-10s - %s", Terminal.cmds[i].name, Terminal.cmds[i].description);
@@ -556,10 +557,10 @@ static void _RemChar()
         CLI_PutChar(' ');
         CLI_PutChar(0x08);
 
-		// сохраняем положение курсора
+		// save current position cursor
 		uint8_t tmpPos = Terminal.buf_curPos - 1;
 
-		// смещаем все последующие символы влево
+		// shift all last symbols
 		for(uint8_t i = tmpPos; i < Terminal.buf_cntr; i++)
 		{
 			Terminal.buf_enter[i] = Terminal.buf_enter[i+1];
@@ -598,9 +599,7 @@ static void _RemChar()
 #endif
 }
 
-/// \brief Добавить новый символ в буфер терминала
-/// \param {char} c - добавляемый символ
-/// \return {TC_Result_e} - результат операции добавления символа
+/// \brief Append new symbols
 TC_Result_e CLI_EnterChar(char c)
 {
 	static bool rstUnlock = false;
@@ -655,7 +654,12 @@ TC_Result_e CLI_EnterChar(char c)
 						((c > 0x40) && (c < 0x5B)) ||
 						(c == 0x20) || (c == '_') || (c == '-'));
 
-	// TODO запихать проверку на выполнение команды и запрет ввода
+	if (Terminal.isEntered)
+	{
+		if (!((c == CHAR_INTERRUPT) || (c == TERM_KEY_RESET)))
+			return TC_Ingore;
+	}
+	
 #if 0
     CLI_DPrintf("\r\nKey Code: 0x%02X", c);
 #endif

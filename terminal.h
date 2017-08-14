@@ -10,7 +10,7 @@ typedef enum{ TE_OK = 0, TE_Err, TE_NotFound, TE_ArgErr, TE_ExecErr, TE_WorkInt,
 typedef enum{ TA_OK = 0, TA_MaxCmd, TA_FcnNull, TA_EmptyName, TA_RetryName, }TA_Result_e;
 
 /// \brief Terminal Char Append Result
-typedef enum{ TC_OK = 0, TC_Enter, TC_BufFull, TC_Reset,}TC_Result_e; 
+typedef enum{ TC_OK = 0, TC_Enter, TC_BufFull, TC_Reset, TC_Ingore,}TC_Result_e; 
 
 /// \brief Terminal Default Init Command
 typedef enum{
