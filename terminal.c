@@ -223,7 +223,7 @@ TE_Result_e _ExecuteString(const char* str)
 {
 	split((char*)str, " ", (args*) &Terminal.input_args);
 
-#if 0
+#if 1
 	for(uint8_t i = 0; i < Terminal.input_args.argc;i++)
         CLI_DPrintf("\r\n: %s", Terminal.input_args.argv[i]);
 #endif
@@ -236,6 +236,8 @@ TE_Result_e _ExecuteString(const char* str)
 	_PrintResultExec(result);
 #endif
 
+	printArrow();
+	
 	return result;
 }
 
@@ -311,8 +313,6 @@ void _PrintResultExec(uint8_t code)
         case TE_WorkInt:	CLI_Printf("\n\rmsg: Command abort");break;
 		default:break;
 	}
-
-	printArrow();
 }
 
 /// \brief Print result add command action
@@ -478,7 +478,7 @@ static void _UpdateCmd(const char* newCmd)
     CLI_PutChar('\r');
 	printArrowWithoutN();
 
-	uint32_t lenNewCmd = _strlen(newCmd) + 1;
+	uint32_t lenNewCmd = _strlen(newCmd);
 	uint32_t lenCurCmd = Terminal.buf_cntr;
 	cli_memcpy(Terminal.buf_enter, newCmd, lenNewCmd);
 	
@@ -498,7 +498,11 @@ static void _UpdateCmd(const char* newCmd)
 	}
 
 	for(uint8_t i = 0; i < cntSpcChar; i++)
-        {CLI_PutChar(0x08);}
+        {CLI_PutChar(TERM_KEY_BACKSPACE);}
+    
+#if 0
+	CLI_DPrintf("\r\nlenNewCmd: %d", lenNewCmd);
+#endif
 }
 
 static void _AddChar(char c)
@@ -521,7 +525,7 @@ static void _AddChar(char c)
 
 		for(uint8_t pos = 0; pos < Terminal.buf_cntr - tmpPos; pos++)
 		{
-            CLI_PutChar(0x08);
+            CLI_PutChar(TERM_KEY_BACKSPACE);
 			Terminal.buf_curPos--;
 		}
 	}
@@ -549,9 +553,9 @@ static void _RemChar()
 
 	if (Terminal.buf_curPos != Terminal.buf_cntr)
 	{
-        CLI_PutChar(0x08);
+        CLI_PutChar(TERM_KEY_BACKSPACE);
         CLI_PutChar(' ');
-        CLI_PutChar(0x08);
+        CLI_PutChar(TERM_KEY_BACKSPACE);
 
 		// save current position cursor
 		uint8_t tmpPos = Terminal.buf_curPos - 1;
@@ -570,24 +574,24 @@ static void _RemChar()
 
 		for(uint8_t pos = 0; pos < Terminal.buf_cntr - tmpPos; pos++)
 		{
-            CLI_PutChar(0x08);
+            CLI_PutChar(TERM_KEY_BACKSPACE);
 			Terminal.buf_curPos--;
 		}
 	}
 	else
 	{
-        CLI_PutChar(0x08);
+        CLI_PutChar(TERM_KEY_BACKSPACE);
         CLI_PutChar(' ');
-        CLI_PutChar(0x08);
+        CLI_PutChar(TERM_KEY_BACKSPACE);
 
 		Terminal.buf_curPos--;
 		Terminal.buf_cntr--;
 		Terminal.buf_enter[Terminal.buf_cntr] = '\0';
 	}
 #else
-    CLI_PutChar(0x08);
+    CLI_PutChar(TERM_KEY_BACKSPACE);
     CLI_PutChar(' ');
-    CLI_PutChar(0x08);
+    CLI_PutChar(TERM_KEY_BACKSPACE);
 
 	Terminal.buf_curPos--;
 	Terminal.buf_cntr--;
@@ -653,7 +657,7 @@ TC_Result_e CLI_EnterChar(char c)
 	if (Terminal.isEntered)
 	{
 		if (!((c == CHAR_INTERRUPT) || (c == TERM_KEY_RESET)))
-			return TC_Ingore;
+			return TC_Ignore;
 	}
 	
 #if 0
@@ -665,6 +669,12 @@ TC_Result_e CLI_EnterChar(char c)
 		{
 			case TERM_KEY_ENTER:
 			{
+				if (Terminal.buf_cntr == 0)
+				{
+					printArrow();
+					return TC_Ignore;
+				}
+				
 				Terminal.isEntered = true;
 				
 				Terminal.buf_enter[Terminal.buf_cntr] = '\0';

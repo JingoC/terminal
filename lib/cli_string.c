@@ -138,6 +138,9 @@ uint8_t _strcmp(const char* str1, const char* str2)
 {
     uint16_t co = 0;
 
+	if (_strlen(str1) != _strlen(str2))
+		return 0;
+
     while(((str1 + co) != NULL) && (*(str1 + co) != '\0') &&
           ((str2 + co) != NULL) && (*(str2 + co) != '\0')){
 

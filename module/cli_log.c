@@ -1,5 +1,9 @@
 #include "cli_log.h"
 
+#include "../lib/cli_string.h"
+
+extern uint8_t _strcmp(const char* str1, const char* str2);
+
 struct{
 	char cmds[TERM_CMD_LOG_SIZE][TERM_CMD_BUF_SIZE];
 	int8_t _curCmd;
@@ -21,14 +25,28 @@ void CLI_LogCmdPush(const char* cmd)
 {
 	if (TermLog._cntCmd < TERM_CMD_LOG_SIZE)
 	{
-		cli_memcpy(TermLog.cmds[TermLog._cntCmd], cmd, TERM_CMD_BUF_SIZE);
-		TermLog._cntCmd++;
+		if (TermLog._cntCmd > 0)
+		{
+			if (_strcmp(cmd, (const char*) TermLog.cmds[TermLog._cntCmd-1]) == 0)
+			{
+				cli_memcpy(TermLog.cmds[TermLog._cntCmd], cmd, TERM_CMD_BUF_SIZE);
+				TermLog._cntCmd++;
+			}
+		}
+		else
+		{
+			cli_memcpy(TermLog.cmds[TermLog._cntCmd], cmd, TERM_CMD_BUF_SIZE);
+			TermLog._cntCmd++;
+		}
 	}
 	else
 	{
-		cli_memcpy(&TermLog.cmds[0][0], &TermLog.cmds[1][0], TERM_CMD_BUF_SIZE*(TERM_CMD_LOG_SIZE - 1));
-		cli_memcpy(&TermLog.cmds[TermLog._cntCmd-1][0], cmd, TERM_CMD_BUF_SIZE);
-		TermLog._cntCmd = TERM_CMD_LOG_SIZE;
+		if (_strcmp(cmd, (const char*) TermLog.cmds[TermLog._cntCmd-1]) == 0)
+		{
+			cli_memcpy(&TermLog.cmds[0][0], &TermLog.cmds[1][0], TERM_CMD_BUF_SIZE*(TERM_CMD_LOG_SIZE - 1));
+			cli_memcpy(&TermLog.cmds[TermLog._cntCmd-1][0], cmd, TERM_CMD_BUF_SIZE);
+			TermLog._cntCmd = TERM_CMD_LOG_SIZE;
+		}
 	}
 }
 
