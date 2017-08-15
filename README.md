@@ -51,4 +51,4 @@ QUICK START
 
 There are examples of working with a terminal for Windows (you need to install a bundle of virtual COM ports COM1 <-> COM2) and for microcontrollers.
 
-        example/
+        examples/
