@@ -35,10 +35,10 @@
 
 extern void _reset_fcn();
 #define _TERM_VER_				"v1.4"				// Terminal version
-#define TERM_SIZE_TASK          (80)				// Max number of commands
-#define TERM_CMD_BUF_SIZE		(80)				// Max number of character buffer string command
+#define TERM_SIZE_TASK          (20)				// Max number of commands
+#define TERM_CMD_BUF_SIZE		(60)				// Max number of character buffer string command
 #define TERM_CMD_LOG_SIZE		(10)				// Max number of loging command
-#define TERM_ARGS_BUF_SIZE		(20)				// Max number of arguments in one command
+#define TERM_ARGS_BUF_SIZE		(10)				// Max number of arguments in one command
 #define TERM_ARG_SIZE			(15)				// Max number character of one arguments
 #define CHAR_INTERRUPT			TERM_KEY_ESCAPE 	// Abort execute command key-code symbol
 #define STRING_TERM_ENTER		"\n\r"				// String new line

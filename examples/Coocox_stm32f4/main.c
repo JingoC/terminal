@@ -86,7 +86,7 @@ void _InitSW()
 {
 	CLI_Init(TDC_Time);
 
-	MyTestCmds_Init();
+	//MyTestCmds_Init();
 }
 
 int main(void)
