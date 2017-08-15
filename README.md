@@ -30,11 +30,12 @@ CONFIG FILE
 
 In the configuration file, you must configure the terminal output:
 
-TERM_TX_RX_EN - the macro controls the inclusion of the terminal output
+        TERM_TX_RX_EN - the macro controls the inclusion of the terminal output
 
 Override output functions:
-CLI_Printf
-CLI_PutChar
+        
+        CLI_Printf
+        CLI_PutChar
 
 Next, you must specify the basic parameters of the terminal:
 
