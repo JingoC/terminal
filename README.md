@@ -38,11 +38,11 @@ CLI_PutChar
 
 Next, you must specify the basic parameters of the terminal:
 
-TERM_SIZE_TASK
-TERM_CMD_BUF_SIZE
-TERM_CMD_LOG_SIZE
-TERM_ARGS_BUF_SIZE
-TERM_ARG_SIZE
+        TERM_SIZE_TASK
+        TERM_CMD_BUF_SIZE
+        TERM_CMD_LOG_SIZE
+        TERM_ARGS_BUF_SIZE
+        TERM_ARG_SIZE
 
 After the above, additional terminal components can be configured.
 
