@@ -478,31 +478,27 @@ static void _UpdateCmd(const char* newCmd)
     CLI_PutChar('\r');
 	printArrowWithoutN();
 
-	cli_memcpy(Terminal.buf_enter, newCmd, TERM_CMD_BUF_SIZE);
-	Terminal.buf_cntr = TERM_CMD_BUF_SIZE;
+	uint32_t lenNewCmd = _strlen(newCmd) + 1;
+	uint32_t lenCurCmd = Terminal.buf_cntr;
+	cli_memcpy(Terminal.buf_enter, newCmd, lenNewCmd);
+	
+	Terminal.buf_cntr = lenNewCmd;
+	Terminal.buf_curPos = lenNewCmd;
 
-
-	uint8_t remCntr = 0;
-	for(uint8_t i = 0; i < TERM_CMD_BUF_SIZE; i++)
+	for(uint8_t i = 0; i < lenNewCmd; i++)
 	{
-		if ((Terminal.buf_enter[i] == '\0') && (Terminal.buf_cntr == TERM_CMD_BUF_SIZE))
-		{
-			Terminal.buf_cntr = i;
-		}
-
-		if (i >= Terminal.buf_cntr)
-		{
-			remCntr++;
-            CLI_PutChar(' ');
-		}
-		else
-            {CLI_PutChar(Terminal.buf_enter[i]);}
+		CLI_PutChar(Terminal.buf_enter[i]);
 	}
 
-	Terminal.buf_curPos = Terminal.buf_cntr;
-	for(uint8_t i = 0; i < remCntr; i++)
-        {CLI_PutChar(0x08);}
+	uint8_t cntSpcChar = 0;
+	for(uint8_t i = lenNewCmd; i < lenCurCmd; i++)
+	{
+		CLI_PutChar(' ');
+		cntSpcChar++;
+	}
 
+	for(uint8_t i = 0; i < cntSpcChar; i++)
+        {CLI_PutChar(0x08);}
 }
 
 static void _AddChar(char c)
