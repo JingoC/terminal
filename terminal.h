@@ -30,7 +30,7 @@ typedef enum{
 }TypeModeCmd_e;
 
 bool CLI_GetIntState();
-#define CLI_RetInt()			{ if (CLI_GetIntState()){return TE_WorkInt;}}
+#define CLI_CheckAbort()			{ if (CLI_GetIntState()){return TE_WorkInt;}}
 
 void CLI_Init(TypeDefaultCmd_e defCmd);
 TA_Result_e CLI_AddCmd(const char* name, 

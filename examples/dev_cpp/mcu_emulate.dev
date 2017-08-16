@@ -28,7 +28,7 @@ Folders=com,terminal,terminal/lib,terminal/module
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=00000000e0000000000000000
+CompilerSettings=00000000e0000000001000000
 UnitCount=16
 
 [VersionInfo]
@@ -71,7 +71,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit3]
-FileName=D:\gitclone\terminal\lib\cli_malloc.c
+FileName=..\..\lib\cli_malloc.c
 CompileCpp=0
 Folder=terminal/lib
 Compile=1
@@ -81,7 +81,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit4]
-FileName=D:\gitclone\terminal\lib\cli_malloc.h
+FileName=..\..\lib\cli_malloc.h
 CompileCpp=0
 Folder=terminal/lib
 Compile=1
@@ -91,7 +91,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit5]
-FileName=D:\gitclone\terminal\lib\cli_queue.c
+FileName=..\..\lib\cli_queue.c
 CompileCpp=0
 Folder=terminal/lib
 Compile=1
@@ -101,7 +101,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit6]
-FileName=D:\gitclone\terminal\lib\cli_queue.h
+FileName=..\..\lib\cli_queue.h
 CompileCpp=0
 Folder=terminal/lib
 Compile=1
@@ -111,7 +111,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit7]
-FileName=D:\gitclone\terminal\lib\cli_string.c
+FileName=..\..\lib\cli_string.c
 CompileCpp=0
 Folder=terminal/lib
 Compile=1
@@ -121,7 +121,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit8]
-FileName=D:\gitclone\terminal\lib\cli_string.h
+FileName=..\..\lib\cli_string.h
 CompileCpp=0
 Folder=terminal/lib
 Compile=1
@@ -131,7 +131,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit9]
-FileName=D:\gitclone\terminal\module\cli_log.c
+FileName=..\..\module\cli_log.c
 CompileCpp=0
 Folder=terminal/module
 Compile=1
@@ -141,7 +141,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit10]
-FileName=D:\gitclone\terminal\module\cli_log.h
+FileName=..\..\module\cli_log.h
 CompileCpp=0
 Folder=terminal/module
 Compile=1
@@ -151,7 +151,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit11]
-FileName=D:\gitclone\terminal\module\cli_time.c
+FileName=..\..\module\cli_time.c
 CompileCpp=0
 Folder=terminal/module
 Compile=1
@@ -161,7 +161,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit12]
-FileName=D:\gitclone\terminal\module\cli_time.h
+FileName=..\..\module\cli_time.h
 CompileCpp=0
 Folder=terminal/module
 Compile=1
@@ -171,7 +171,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit13]
-FileName=D:\gitclone\terminal\terminal.c
+FileName=..\..\terminal.c
 CompileCpp=0
 Folder=terminal
 Compile=1
@@ -181,7 +181,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit14]
-FileName=D:\gitclone\terminal\terminal.h
+FileName=..\..\terminal.h
 CompileCpp=0
 Folder=terminal
 Compile=1

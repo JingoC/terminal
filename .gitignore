@@ -4,3 +4,7 @@
 /examples/Coocox_stm32f4/stm32f4_terminal_example/Debug/obj/history.xml
 /examples/Coocox_stm32f4/stm32f4_terminal_example/stm32f4_terminal_example.elf.xcodeproj/*.pbxproj
 /examples/Coocox_stm32f4/stm32f4_terminal_example/Debug/obj/dependencies.xml
+/examples/Proteus_emulate/atmega32/src_prj/default/dep/*.d
+/examples/Proteus_emulate/atmega32/src_prj/default/atmega32_terminal.map
+/examples/Proteus_emulate/atmega32/src_prj/default/atmega32_terminal.lss
+/examples/Proteus_emulate/atmega32/src_prj/default/atmega32_terminal.eep

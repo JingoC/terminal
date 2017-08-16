@@ -132,8 +132,8 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
     printArrow();
 }
 
-#define CLI_GetDecString(str)        ((uint32_t) strtoll((const char*)str, NULL, 10))
-#define CLI_GetHexString(str)        ((uint32_t) strtoll((const char*)str, NULL, 16))
+#define CLI_GetDecString(str)        ((uint32_t) strtol((const char*)str, NULL, 10))
+#define CLI_GetHexString(str)        ((uint32_t) strtol((const char*)str, NULL, 16))
 
 inline uint32_t CLI_GetArgDec(uint8_t index)
 {
@@ -223,7 +223,7 @@ TE_Result_e _ExecuteString(const char* str)
 {
 	split((char*)str, " ", (args*) &Terminal.input_args);
 
-#if 1
+#if 0
 	for(uint8_t i = 0; i < Terminal.input_args.argc;i++)
         CLI_DPrintf("\r\n: %s", Terminal.input_args.argv[i]);
 #endif
@@ -339,10 +339,7 @@ int8_t _IndexOfFlag(const char* flag)
 	{
 		if (_strcmp(Terminal.input_args.argv[i], flag))
 		{
-			if ((Terminal.input_args.argc > (i + 1)) || (flag[0] != '-'))
-				{return i;}
-			else
-				{return -1;}
+			return i;
 		}
 	}
 

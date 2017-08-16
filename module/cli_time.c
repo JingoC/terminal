@@ -12,7 +12,7 @@ CLI_Time_s CLI_GenerateTimeMSec(uint32_t msec)
 	uint32_t m = s / 60;
 	res.minute = m % 60;
 	uint32_t h = s / 3600;
-	res.hour = h;// % 24;
+	res.hour = h;
 
 	return res;
 }
@@ -26,7 +26,7 @@ CLI_Time_s CLI_GenerateTime(uint32_t sec)
 	uint32_t m = sec / 60;
 	res.minute = m % 60;
 	uint32_t h = sec / 3600;
-	res.hour = h;// % 24;
+	res.hour = h;
 
 	return res;
 }
