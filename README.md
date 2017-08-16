@@ -30,19 +30,20 @@ CONFIG FILE
 
 In the configuration file, you must configure the terminal output:
 
-TERM_TX_RX_EN - the macro controls the inclusion of the terminal output
+        TERM_TX_RX_EN - the macro controls the inclusion of the terminal output
 
 Override output functions:
-CLI_Printf
-CLI_PutChar
+        
+        CLI_Printf
+        CLI_PutChar
 
 Next, you must specify the basic parameters of the terminal:
 
-TERM_SIZE_TASK
-TERM_CMD_BUF_SIZE
-TERM_CMD_LOG_SIZE
-TERM_ARGS_BUF_SIZE
-TERM_ARG_SIZE
+        TERM_SIZE_TASK
+        TERM_CMD_BUF_SIZE
+        TERM_CMD_LOG_SIZE
+        TERM_ARGS_BUF_SIZE
+        TERM_ARG_SIZE
 
 After the above, additional terminal components can be configured.
 
@@ -51,4 +52,4 @@ QUICK START
 
 There are examples of working with a terminal for Windows (you need to install a bundle of virtual COM ports COM1 <-> COM2) and for microcontrollers.
 
-        example/
+        examples/
