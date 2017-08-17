@@ -132,6 +132,21 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
     printArrow();
 }
 
+/// \brief Get index coinciding args string or -1
+/// \param flag - searched string
+int8_t _IndexOfFlag(const char* flag)
+{
+	for(uint8_t i = 0; i < Terminal.input_args.argc; i++)
+	{
+		if (_strcmp(Terminal.input_args.argv[i], flag))
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
 #define CLI_GetDecString(str)        ((uint32_t) strtol((const char*)str, NULL, 10))
 #define CLI_GetHexString(str)        ((uint32_t) strtol((const char*)str, NULL, 16))
 
@@ -148,7 +163,7 @@ inline uint32_t CLI_GetArgHex(uint8_t index)
 bool CLI_GetArgDecByFlag(const char* flag, uint32_t* outValue)
 {
 	int8_t w = _IndexOfFlag(flag);
-	if (w != 0)
+	if ((w > 0) && (w + 1 < Terminal.input_args.argc))
 	{
 		*outValue = CLI_GetArgDec(w);
 		return true;
@@ -160,7 +175,7 @@ bool CLI_GetArgDecByFlag(const char* flag, uint32_t* outValue)
 bool CLI_GetArgHexByFlag(const char* flag, uint32_t* outValue)
 {
 	int8_t w = _IndexOfFlag(flag);
-	if (w != 0)
+	if ((w > 0) && (w + 1 < Terminal.input_args.argc))
 	{
 		*outValue = CLI_GetArgHex(w);
 		return true;
@@ -222,6 +237,11 @@ TE_Result_e _Execute(char** argv, uint8_t argc)
 TE_Result_e _ExecuteString(const char* str)
 {
 	split((char*)str, " ", (args*) &Terminal.input_args);
+
+#if 0
+	CLI_DPrintf("\r\nCMD: ");
+	CLI_DPrintf(str);
+#endif
 
 #if 0
 	for(uint8_t i = 0; i < Terminal.input_args.argc;i++)
@@ -329,21 +349,6 @@ void _PrintResultAddCmd(uint8_t code)
 		default:break;
 	}
 #endif
-}
-
-/// \brief Get index coinciding args string or -1
-/// \param flag - searched string
-int8_t _IndexOfFlag(const char* flag)
-{
-	for(uint8_t i = 0; i < Terminal.input_args.argc; i++)
-	{
-		if (_strcmp(Terminal.input_args.argv[i], flag))
-		{
-			return i;
-		}
-	}
-
-	return -1;
 }
 
 /// \brief Search command by name
@@ -475,31 +480,47 @@ static void _UpdateCmd(const char* newCmd)
     CLI_PutChar('\r');
 	printArrowWithoutN();
 
-	uint32_t lenNewCmd = _strlen(newCmd);
-	uint32_t lenCurCmd = Terminal.buf_cntr;
-	cli_memcpy(Terminal.buf_enter, newCmd, lenNewCmd);
+	if (Terminal.buf_enter != newCmd)
+	{
+		uint32_t lenNewCmd = _strlen(newCmd);
+		uint32_t lenCurCmd = Terminal.buf_cntr;
+		cli_memcpy(Terminal.buf_enter, newCmd, lenNewCmd);
 	
-	Terminal.buf_cntr = lenNewCmd;
-	Terminal.buf_curPos = lenNewCmd;
+		Terminal.buf_cntr = lenNewCmd;
+		Terminal.buf_curPos = lenNewCmd;
 
-	for(uint8_t i = 0; i < lenNewCmd; i++)
-	{
-		CLI_PutChar(Terminal.buf_enter[i]);
-	}
+		for(uint8_t i = 0; i < lenNewCmd; i++)
+		{
+			CLI_PutChar(Terminal.buf_enter[i]);
+		}
 
-	uint8_t cntSpcChar = 0;
-	for(uint8_t i = lenNewCmd; i < lenCurCmd; i++)
-	{
-		CLI_PutChar(' ');
-		cntSpcChar++;
-	}
+		uint8_t cntSpcChar = 0;
+		for(uint8_t i = lenNewCmd; i < lenCurCmd; i++)
+		{
+			CLI_PutChar(' ');
+			cntSpcChar++;
+		}
 
-	for(uint8_t i = 0; i < cntSpcChar; i++)
-        {CLI_PutChar(TERM_KEY_BACKSPACE);}
-    
+		for(uint8_t i = 0; i < cntSpcChar; i++)
+        	{CLI_PutChar(TERM_KEY_BACKSPACE);}	
+        	
 #if 0
-	CLI_DPrintf("\r\nlenNewCmd: %d", lenNewCmd);
+		CLI_DPrintf("\r\nNewCmd: %s", newCmd);
+		CLI_DPrintf("\r\nlenNewCmd: %d", lenNewCmd);
 #endif
+
+	}
+	else
+	{
+		for(uint8_t i = 0; i < Terminal.buf_cntr; i++)
+		{
+			CLI_PutChar(Terminal.buf_enter[i]);
+		}
+#if 0
+		CLI_DPrintf("\r\nBufEnter: %s", Terminal.buf_enter);
+		CLI_DPrintf("\r\nlenNewCmd: %d", Terminal.buf_cntr);
+#endif
+	}
 }
 
 static void _AddChar(char c)
@@ -507,22 +528,21 @@ static void _AddChar(char c)
 #if (TERM_LR_KEY_EN == 1)
 	if (Terminal.buf_curPos != Terminal.buf_cntr)
 	{
-		for(uint8_t i = Terminal.buf_cntr + 1; i > Terminal.buf_curPos; i--)
-		{
-			Terminal.buf_enter[i] = Terminal.buf_enter[i-1];
-		}
-
-		Terminal.buf_enter[Terminal.buf_curPos] = c;
+		uint8_t tmpPos = Terminal.buf_curPos;
+		cli_memcpy(Terminal.buf_transit, Terminal.buf_enter, tmpPos);
+		cli_memcpy(Terminal.buf_transit + tmpPos, &c, 1);
+		cli_memcpy(Terminal.buf_transit + tmpPos + 1, Terminal.buf_enter + tmpPos, Terminal.buf_cntr - tmpPos);
+		
 		Terminal.buf_cntr++;
 		Terminal.buf_curPos++;
 		Terminal.buf_enter[Terminal.buf_cntr] = '\0';
 
-		uint8_t tmpPos = Terminal.buf_curPos;
-		_UpdateCmd(Terminal.buf_enter);
+		tmpPos++;
+		_UpdateCmd(Terminal.buf_transit);
 
 		for(uint8_t pos = 0; pos < Terminal.buf_cntr - tmpPos; pos++)
 		{
-            CLI_PutChar(TERM_KEY_BACKSPACE);
+            CLI_PutChar(TERM_KEY_LSHIFT);
 			Terminal.buf_curPos--;
 		}
 	}
@@ -550,28 +570,19 @@ static void _RemChar()
 
 	if (Terminal.buf_curPos != Terminal.buf_cntr)
 	{
-        CLI_PutChar(TERM_KEY_BACKSPACE);
-        CLI_PutChar(' ');
-        CLI_PutChar(TERM_KEY_BACKSPACE);
-
 		// save current position cursor
 		uint8_t tmpPos = Terminal.buf_curPos - 1;
 
-		// shift all last symbols
-		for(uint8_t i = tmpPos; i < Terminal.buf_cntr; i++)
-		{
-			Terminal.buf_enter[i] = Terminal.buf_enter[i+1];
-		}
-
-		Terminal.buf_curPos--;
-		Terminal.buf_cntr--;
-		Terminal.buf_enter[Terminal.buf_cntr] = '\0';
-
-		_UpdateCmd(Terminal.buf_enter);
+		cli_memcpy(Terminal.buf_transit, Terminal.buf_enter, tmpPos);
+		cli_memcpy(Terminal.buf_transit + tmpPos, Terminal.buf_enter + tmpPos + 1, Terminal.buf_cntr - tmpPos);
+		
+		Terminal.buf_transit[Terminal.buf_cntr - 1] = '\0';
+		
+		_UpdateCmd(Terminal.buf_transit);
 
 		for(uint8_t pos = 0; pos < Terminal.buf_cntr - tmpPos; pos++)
 		{
-            CLI_PutChar(TERM_KEY_BACKSPACE);
+            CLI_PutChar(TERM_KEY_LSHIFT);
 			Terminal.buf_curPos--;
 		}
 	}
@@ -580,7 +591,7 @@ static void _RemChar()
         CLI_PutChar(TERM_KEY_BACKSPACE);
         CLI_PutChar(' ');
         CLI_PutChar(TERM_KEY_BACKSPACE);
-
+        
 		Terminal.buf_curPos--;
 		Terminal.buf_cntr--;
 		Terminal.buf_enter[Terminal.buf_cntr] = '\0';
@@ -723,7 +734,7 @@ TC_Result_e CLI_EnterChar(char c)
 				if (Terminal.buf_curPos > 0)
 				{
 					Terminal.buf_curPos--;
-                    CLI_PutChar(0x08);
+                    CLI_PutChar(TERM_KEY_LSHIFT);
 				}
 #endif
 			}break;
