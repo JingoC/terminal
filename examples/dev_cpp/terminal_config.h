@@ -28,6 +28,7 @@
 #define TERM_KEY_DOWN					(_KEY_INIT(0xF3))		// KeyDown symbol
 #define TERM_KEY_LEFT					(_KEY_INIT(0xF4))		// KeyLeft symbol
 #define TERM_KEY_DEL					(_KEY_INIT(0xF5))		// Delete character after cursor position
+#define TERM_KEY_TAB					(_KEY_INIT(0x09))		//
 #define TERM_KEY_RESET					'~'						// Reset CPU
 
 // **************************************************************************
@@ -49,6 +50,7 @@
 #define TERM_TX_RX_EN					(1)			// Terminal Printf (without this don,t work)
 #define TERM_TX_RX_DEB_EN				(1)			// Addition debug printf
 #define TERM_CMD_LOG_EN					(1)			// Command logging
+#define TERM_CMD_AUTOCMPLT_EN			(1)			// Command AutoComplete
 #define TERM_LR_KEY_EN					(1)			// Move cursor left-rigth
 #define TERM_DEFAULT_ALLOC_EN			(1)			// Default Memory Allocate functions
 #define TERM_DEFAULT_STRING_EN			(1)			// Default String functions

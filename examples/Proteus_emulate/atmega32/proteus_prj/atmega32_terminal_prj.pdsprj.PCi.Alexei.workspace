@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <WORKSPACE>
  <FRAME activewindow="0">
-  <PLACEMENT>2c0000000200000003000000ffffffffffffffffffffffffffffffff3c0000001c000000ca0400000a030000</PLACEMENT>
+  <PLACEMENT>2c00000002000000030000000083ffff0083ffffffffffffffffffff3c0000001c000000ca0400000a030000</PLACEMENT>
   <WINDOW type="default" module="ISIS"/>
  </FRAME>
  <MODULE name="VSMDEBUG">
@@ -28,7 +28,8 @@
      <ITEM name="Item 5">"TCCR1A","0x004F",00000002,0000000D,47,1,2,CEC60000,0,00000000,00000000</ITEM>
      <ITEM name="Item 6">"TIFR","0x0058",00000002,0000000D,56,1,2,47E40000,0,00000000,00000000</ITEM>
      <ITEM name="Item 7">"TIMSK","0x0059",00000002,0000000D,57,1,2,5BD90000,0,00000000,00000000</ITEM>
-     <ITEM name="Item 8">"secTmt","R17:R16",00000002,0000000E,16,2,4,00000003,0,00000000,00000000</ITEM>
+     <ITEM name="Item 8">"secTmt","R17:R16",00000002,0000000E,16,2,2,00000003,0,00000000,00000000</ITEM>
+     <ITEM name="Item 9">"SPSR","0x002E",00000002,0000000D,14,1,2,7E0C0000,0,00000000,00000000</ITEM>
      <ITEM name="Name Column Width">85</ITEM>
      <ITEM name="ShowAddresses">Yes</ITEM>
      <ITEM name="ShowPreviousValues">No</ITEM>
@@ -39,10 +40,10 @@
      <ITEM name="Version">100</ITEM>
      <ITEM name="Watch Expression Column Width">130</ITEM>
      <ITEM name="WatchPoint 0">1,0,00000000,</ITEM>
-     <ITEM name="nItems">9</ITEM>
+     <ITEM name="nItems">10</ITEM>
     </PROPERTIES>
    </POPUP>
-   <POPUP w="441" x="834" flags="00000023" y="285" h="405" pid="0" iid="1">
+   <POPUP w="441" x="844" flags="00008023" y="293" h="405" pid="0" iid="1">
     <PROPERTIES>
      <ITEM name="AutoEcho">0</ITEM>
      <ITEM name="HexMode">0</ITEM>
@@ -111,15 +112,17 @@
      <ITEM name="TopLineAddress">00000020</ITEM>
     </PROPERTIES>
    </POPUP>
-   <POPUP w="600" x="37" flags="0000002b" y="118" h="400" pid="1" iid="2">
+   <POPUP w="600" x="109" flags="0000002b" y="40" h="400" pid="1" iid="2">
     <PROPERTIES>
+     <ITEM name="Breakpoint 0">"MainLoop",00CC,000A,C13B,1A33,-1
+</ITEM>
      <ITEM name="CaseSensitive">No</ITEM>
      <ITEM name="DISPADDRS">Yes</ITEM>
      <ITEM name="DISPLNUMS">No</ITEM>
      <ITEM name="DISPOPCODES">No</ITEM>
      <ITEM name="FIXUPBPTS">Yes</ITEM>
      <ITEM name="WordsOnly">No</ITEM>
-     <ITEM name="nBreakpoints">0</ITEM>
+     <ITEM name="nBreakpoints">1</ITEM>
     </PROPERTIES>
    </POPUP>
    <POPUP w="366" x="953" flags="0000000b" y="0" h="328" pid="2" iid="2">
@@ -139,7 +142,7 @@
      <ITEM name="nItems">0</ITEM>
     </PROPERTIES>
    </POPUP>
-   <POPUP w="695" x="95" flags="00008001" y="215" h="446" pid="0" iid="3">
+   <POPUP w="695" x="67" flags="00000001" y="279" h="446" pid="0" iid="3">
     <PROPERTIES/>
    </POPUP>
    <POPUP w="40" x="57" flags="00000008" y="138" h="4" pid="1" iid="4">

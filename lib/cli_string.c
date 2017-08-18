@@ -134,6 +134,21 @@ uint16_t _getCountSeparator(const char* strSrc, const char* separator)
     return result + 1;
 }
 
+uint8_t _strPartCmp(const char* str1, const char* str2)
+{
+	uint8_t co = 0;
+	while(((str1 + co) != NULL) && (*(str1 + co) != '\0') &&
+          ((str2 + co) != NULL) && (*(str2 + co) != '\0')){
+
+        if (str1[co] != str2[co])
+            return 0;
+
+        co++;
+    }
+    
+    return 1;
+}
+
 uint8_t _strcmp(const char* str1, const char* str2)
 {
     uint16_t co = 0;

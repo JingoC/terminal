@@ -4,7 +4,7 @@ Name=mcu_emulate
 Type=1
 Ver=2
 ObjFiles=
-Includes=D:\gitclone\terminal;C:\Users\Alexei\Documents\devcpp\projects\mcu_emulate
+Includes=D:\gitclone\terminal;D:\gitclone\terminal\examples\dev_cpp
 Libs=
 PrivateResource=
 ResourceIncludes=
@@ -61,16 +61,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit2]
-FileName=terminal_config.h
-CompileCpp=0
-Folder=terminal
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit3]
 FileName=..\..\lib\cli_malloc.c
 CompileCpp=0
 Folder=terminal/lib
@@ -80,7 +70,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit4]
+[Unit3]
 FileName=..\..\lib\cli_malloc.h
 CompileCpp=0
 Folder=terminal/lib
@@ -90,7 +80,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit5]
+[Unit4]
 FileName=..\..\lib\cli_queue.c
 CompileCpp=0
 Folder=terminal/lib
@@ -100,7 +90,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit6]
+[Unit5]
 FileName=..\..\lib\cli_queue.h
 CompileCpp=0
 Folder=terminal/lib
@@ -110,7 +100,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit7]
+[Unit6]
 FileName=..\..\lib\cli_string.c
 CompileCpp=0
 Folder=terminal/lib
@@ -120,7 +110,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit8]
+[Unit7]
 FileName=..\..\lib\cli_string.h
 CompileCpp=0
 Folder=terminal/lib
@@ -130,7 +120,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit9]
+[Unit8]
 FileName=..\..\module\cli_log.c
 CompileCpp=0
 Folder=terminal/module
@@ -140,7 +130,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit10]
+[Unit9]
 FileName=..\..\module\cli_log.h
 CompileCpp=0
 Folder=terminal/module
@@ -150,7 +140,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit11]
+[Unit10]
 FileName=..\..\module\cli_time.c
 CompileCpp=0
 Folder=terminal/module
@@ -160,7 +150,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit12]
+[Unit11]
 FileName=..\..\module\cli_time.h
 CompileCpp=0
 Folder=terminal/module
@@ -170,7 +160,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit13]
+[Unit12]
 FileName=..\..\terminal.c
 CompileCpp=0
 Folder=terminal
@@ -180,7 +170,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit14]
+[Unit13]
 FileName=..\..\terminal.h
 CompileCpp=0
 Folder=terminal
@@ -190,7 +180,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit15]
+[Unit14]
 FileName=com\com.c
 CompileCpp=0
 Folder=com
@@ -200,10 +190,20 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit16]
+[Unit15]
 FileName=com\com.h
 CompileCpp=0
 Folder=com
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit16]
+FileName=terminal_config.h
+CompileCpp=0
+Folder=terminal
 Compile=1
 Link=1
 Priority=1000

@@ -18,6 +18,7 @@ void CLI_PrintTimeWithoutRN();
 
 extern uint8_t _strcmp(const char* str1, const char* str2);
 extern uint32_t _strlen(const char* strSrc);
+extern uint8_t _strPartCmp(const char* str1, const char* str2);
 
 static uint8_t _help_cmd();
 static uint8_t _reset_cpu();
@@ -371,6 +372,33 @@ TermCmd_s* _findTermCmd(const char* cmdName)
     return NULL;
 }
 
+/// \brief Search command by name
+/// \return Command pointer or NULL
+TermCmd_s* _findPartTermCmd(const char* cmdName)
+{
+	TermCmd_s* result = NULL;
+	
+	uint8_t i = 0;
+    for(; i < Terminal.countCommand; i++){
+
+    	char* name1 = (char*) Terminal.cmds[i].name;
+    	char* name2 = (char*) cmdName;
+	
+    	int res = _strPartCmp(name1, name2);
+
+        if (res){
+        	if (result != NULL)
+        	{
+        		return NULL;
+			}
+			
+            result = &Terminal.cmds[i];
+        }
+    }
+
+    return result;
+}
+
 // ************************************************************************
 
 // ************************* sys cmd terminal *****************************
@@ -640,6 +668,7 @@ TC_Result_e CLI_EnterChar(char c)
 	uint8_t arr_esc[]	= {0x1B, 0x1B, 0x1B};
 	uint8_t del[]		= {0x1B, 0x5B, 0x33};
 	
+	
 	if (Q_IsEqual(&Terminal.symbols, arr_up, 3))
 		{c = TERM_KEY_UP;}
 	else if (Q_IsEqual(&Terminal.symbols, arr_down, 3))
@@ -712,6 +741,25 @@ TC_Result_e CLI_EnterChar(char c)
 				{
 					rstUnlock = true;
 				}
+			}break;
+			case TERM_KEY_TAB:
+			{
+#if (TERM_CMD_AUTOCMPLT_EN == 1)
+				if ((Terminal.buf_cntr > 0) && (Terminal.buf_enter[Terminal.buf_cntr - 1] != ' '))
+				{
+					TermCmd_s* cmd = _findPartTermCmd(Terminal.buf_enter);
+					
+					if (cmd != NULL)
+					{
+						uint8_t len = _strlen(cmd->name);
+						cli_memcpy(Terminal.buf_enter, cmd->name, len + 1);
+					
+						Terminal.buf_cntr = len;
+						Terminal.buf_curPos = len;
+						_UpdateCmd(Terminal.buf_enter);
+					}
+				}
+#endif
 			}break;
 			case TERM_KEY_DOWN:
 			{
