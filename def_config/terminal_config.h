@@ -1,11 +1,5 @@
 /*************************************************************************
- *
  *			Terminal configure file
- *
- *	---------------------------------------------------------------------
- *
- *	Examples in Readme.h file.
- *
  ************************************************************************/
 
 #ifndef _TERMIANL_CONFIG_H_
@@ -98,6 +92,7 @@ extern void COM_Putc(char c);
 #if (TERM_TIMELEFT_EN == 1)
 
 	// yout implementation
+<<<<<<< HEAD
 extern volatile uint64_t SysTickCtr;							// Variable tackts cntr
 
 #define Terminal_GetUs()			((float)SysTickCtr * 10)	// System time in us
@@ -105,6 +100,15 @@ extern volatile uint64_t SysTickCtr;							// Variable tackts cntr
 #define Terminal_GetMs()			((float)SysTickCtr / 100)	// System time in ms
 #define Terminal_GetFastMs()		(SysTickCtr >> 7)			// System time in ms (not exact)
 #define SysTimeReset()				{SysTickCtr = 0;}			// Reset System time
+=======
+extern volatile uint64_t SysTickCtr;						// 
+
+#define Terminal_GetUs()			((float)SysTickCtr * 10)	// 
+#define Terminal_GetFastUs()		(SysTickCtr << 3)			// 
+#define Terminal_GetMs()			((float)SysTickCtr / 100)	// 
+#define Terminal_GetFastMs()		(SysTickCtr >> 7)			// 
+#define SysTimeReset()				{SysTickCtr = 0;}		// 
+>>>>>>> 2f619e06dcc19bf5b2fd46b8c0c566a947e57a20
 #define delay_ms(ms)				{uint32_t ms_cntr_67 = Terminal_GetMs(); while(((uint32_t)Terminal_GetMs() - ms_cntr_67) < (ms)) {}}
 #define delay_us(us)				{uint32_t us_cntr_67 = Terminal_GetUs(); while(((uint32_t)Terminal_GetUs() - us_cntr_67) < (us)) {}}
 
