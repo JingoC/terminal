@@ -2,7 +2,6 @@
 
 #include "uart.h"
 
-
 #include <avr/io.h>
 
 void UART_Init(uint32_t baudrate)

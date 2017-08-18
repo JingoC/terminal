@@ -40,7 +40,7 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 INCLUDES = -I"D:\gitclone\terminal\examples\Proteus_emulate\atmega32\src_prj\." -I"D:\gitclone\terminal\examples\Proteus_emulate\atmega32\src_prj\..\..\..\.." -I"D:\gitclone\terminal\examples\Proteus_emulate\atmega32\src_prj\..\..\..\..\lib" -I"D:\gitclone\terminal\examples\Proteus_emulate\atmega32\src_prj\..\..\..\..\module" 
 
 ## Objects that must be built in order to link
-OBJECTS = main.o uart.o terminal.o cli_log.o cli_time.o cli_malloc.o cli_queue.o cli_string.o 
+OBJECTS = main.o uart.o terminal.o cli_log.o cli_time.o cli_malloc.o cli_queue.o cli_string.o spi.o timer1.o test_cmds.o temperature.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
@@ -71,6 +71,18 @@ cli_queue.o: ../../../../../lib/cli_queue.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 cli_string.o: ../../../../../lib/cli_string.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+spi.o: ../lib/spi/spi.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+timer1.o: ../lib/timer/timer1.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+test_cmds.o: ../test_cmds/test_cmds.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+temperature.o: ../lib/temp_sensor/temperature.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 ##Link

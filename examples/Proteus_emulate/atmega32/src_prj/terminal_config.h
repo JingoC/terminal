@@ -34,8 +34,8 @@
 // ********************** Terminal Settings *********************************
 
 #define _TERM_VER_				"v1.4"				// Terminal version
-#define TERM_SIZE_TASK          (10)				// Max number of commands
-#define TERM_CMD_BUF_SIZE		(40)				// Max number of character buffer string command
+#define TERM_SIZE_TASK          (4)				// Max number of commands
+#define TERM_CMD_BUF_SIZE		(20)				// Max number of character buffer string command
 #define TERM_CMD_LOG_SIZE		(5)				// Max number of loging command
 #define TERM_ARGS_BUF_SIZE		(20)				// Max number of arguments in one command
 #define TERM_ARG_SIZE			(15)				// Max number character of one arguments
