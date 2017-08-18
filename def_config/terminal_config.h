@@ -1,11 +1,5 @@
 /*************************************************************************
- *
  *			Terminal configure file
- *
- *	---------------------------------------------------------------------
- *
- *	Examples in Readme.h file.
- *
  ************************************************************************/
 
 #ifndef _TERMIANL_CONFIG_H_
@@ -94,13 +88,13 @@ extern void COM_Putc(char c);
 #if (TERM_TIMELEFT_EN == 1)
 
 	// yout implementation
-extern volatile uint64_t SysTickCtr;							// Переменная содержит счетчик тактов
+extern volatile uint64_t SysTickCtr;						// 
 
-#define Terminal_GetUs()			((float)SysTickCtr * 10)	// Функция возвращающая системное время в us
-#define Terminal_GetFastUs()		(SysTickCtr << 3)			// Функция возвращающая системное время в us (не точное)
-#define Terminal_GetMs()			((float)SysTickCtr / 100)	// Функция возвращающая системное время в ms
-#define Terminal_GetFastMs()		(SysTickCtr >> 7)			// Функция возвращающая системное время в ms (не точное)
-#define SysTimeReset()				{SysTickCtr = 0;}			// Функция сбрасывающая системное время
+#define Terminal_GetUs()			((float)SysTickCtr * 10)	// 
+#define Terminal_GetFastUs()		(SysTickCtr << 3)			// 
+#define Terminal_GetMs()			((float)SysTickCtr / 100)	// 
+#define Terminal_GetFastMs()		(SysTickCtr >> 7)			// 
+#define SysTimeReset()				{SysTickCtr = 0;}		// 
 #define delay_ms(ms)				{uint32_t ms_cntr_67 = Terminal_GetMs(); while(((uint32_t)Terminal_GetMs() - ms_cntr_67) < (ms)) {}}
 #define delay_us(us)				{uint32_t us_cntr_67 = Terminal_GetUs(); while(((uint32_t)Terminal_GetUs() - us_cntr_67) < (us)) {}}
 
