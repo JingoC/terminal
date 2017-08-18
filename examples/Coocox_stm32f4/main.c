@@ -62,7 +62,7 @@ void _InitHW()
 	GPIO_PinAFConfig(TERMINAL_GPIO, GPIO_PinSource9, GPIO_AF_USART3);
 
 	USART_InitTypeDef usart;
-	usart.USART_BaudRate = 9600;
+	usart.USART_BaudRate = 115200;
 	usart.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	usart.USART_Parity = USART_Parity_No;
 	usart.USART_HardwareFlowControl = USART_HardwareFlowControl_None;

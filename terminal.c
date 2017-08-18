@@ -532,6 +532,7 @@ static void _AddChar(char c)
 		cli_memcpy(Terminal.buf_transit, Terminal.buf_enter, tmpPos);
 		cli_memcpy(Terminal.buf_transit + tmpPos, &c, 1);
 		cli_memcpy(Terminal.buf_transit + tmpPos + 1, Terminal.buf_enter + tmpPos, Terminal.buf_cntr - tmpPos);
+		Terminal.buf_transit[Terminal.buf_cntr + 1] = '\0';
 		
 		Terminal.buf_cntr++;
 		Terminal.buf_curPos++;

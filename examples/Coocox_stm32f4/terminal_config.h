@@ -21,6 +21,7 @@
 
 #define TERM_KEY_ENTER					(_KEY_INIT(0x0D))		// Enter command symbol
 #define TERM_KEY_BACKSPACE				(_KEY_INIT(0x08))		// Delete character before cursor position
+#define TERM_KEY_LSHIFT					(_KEY_INIT(0x08))		// Left shift symbol
 #define TERM_KEY_ESCAPE					(_KEY_INIT(0xF0))		// Exception execute command symbol
 #define TERM_KEY_UP						(_KEY_INIT(0xF1))		// KeyUp symbol
 #define TERM_KEY_RIGHT					(_KEY_INIT(0xF2))		// KeyRight symbol
