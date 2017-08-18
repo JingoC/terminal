@@ -4,8 +4,8 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = main.o ../../lib/cli_malloc.o ../../lib/cli_queue.o ../../lib/cli_string.o ../../module/cli_log.o ../../module/cli_time.o ../../terminal.o com/com.o
-LINKOBJ  = main.o ../../lib/cli_malloc.o ../../lib/cli_queue.o ../../lib/cli_string.o ../../module/cli_log.o ../../module/cli_time.o ../../terminal.o com/com.o
+OBJ      = main.o ../../lib/cli_queue.o ../../lib/cli_string.o ../../module/cli_log.o ../../module/cli_time.o ../../terminal.o com/com.o
+LINKOBJ  = main.o ../../lib/cli_queue.o ../../lib/cli_string.o ../../module/cli_log.o ../../module/cli_time.o ../../terminal.o com/com.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -g3
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"D:/gitclone/terminal" -I"D:/gitclone/terminal/examples/dev_cpp"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++" -I"D:/gitclone/terminal" -I"D:/gitclone/terminal/examples/dev_cpp"
@@ -26,9 +26,6 @@ $(BIN): $(OBJ)
 
 main.o: main.c
 	$(CC) -c main.c -o main.o $(CFLAGS)
-
-../../lib/cli_malloc.o: ../../lib/cli_malloc.c
-	$(CC) -c ../../lib/cli_malloc.c -o ../../lib/cli_malloc.o $(CFLAGS)
 
 ../../lib/cli_queue.o: ../../lib/cli_queue.c
 	$(CC) -c ../../lib/cli_queue.c -o ../../lib/cli_queue.o $(CFLAGS)

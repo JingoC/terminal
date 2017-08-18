@@ -125,7 +125,13 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
         Terminal.input_args.argv[i] = cli_malloc(sizeof(char) * (TERM_ARG_SIZE + 1));
 
     Q_Init(&Terminal.symbols, 3, sizeof(char), QUEUE_FORCED_PUSH_POP_Msk);
-
+    
+    for(uint8_t i = 0; i < 3; i++)
+    {
+    	char c = 0;
+    	Q_Push(&Terminal.symbols, &c);
+	}
+	
 #if (TERM_CMD_LOG_EN == 1)
     CLI_LogInit();
 #endif
@@ -637,8 +643,10 @@ static void _RemChar()
 }
 
 /// \brief Append new symbols
-TC_Result_e CLI_EnterChar(char c)
+TC_Result_e CLI_EnterChar(char ch)
 {
+	char c = ch;
+	
 	static bool rstUnlock = false;
 	if(rstUnlock && (c != TERM_KEY_RESET))
 		rstUnlock = false;
@@ -667,7 +675,8 @@ TC_Result_e CLI_EnterChar(char c)
 	uint8_t arr_left[]	= {0x1B, 0x5B, 0x44};
 	uint8_t arr_esc[]	= {0x1B, 0x1B, 0x1B};
 	uint8_t del[]		= {0x1B, 0x5B, 0x33};
-	
+	uint8_t home[]		= {0x1B, 0x5B, 0x31};
+	uint8_t end[]		= {0x1B, 0x5B, 0x34};
 	
 	if (Q_IsEqual(&Terminal.symbols, arr_up, 3))
 		{c = TERM_KEY_UP;}
@@ -681,6 +690,10 @@ TC_Result_e CLI_EnterChar(char c)
 		{c = TERM_KEY_ESCAPE;}
 	else if (Q_IsEqual(&Terminal.symbols, del, 3))
 		{c = TERM_KEY_DEL;}
+	else if (Q_IsEqual(&Terminal.symbols, home, 3))
+		{c = TERM_KEY_HOME;}
+	else if (Q_IsEqual(&Terminal.symbols, end, 3))
+		{c = TERM_KEY_END;}
 	
 	bool isValidKey = ((Terminal.buf_cntr < TERM_CMD_BUF_SIZE) ||
 						(c == TERM_KEY_BACKSPACE) ||
@@ -699,7 +712,12 @@ TC_Result_e CLI_EnterChar(char c)
 	}
 	
 #if 0
-    CLI_DPrintf("\r\nKey Code: 0x%02X", c);
+	CLI_DPrintf("\r\n");
+	for(uint8_t i = 0; i < 4; i++)
+	{
+		CLI_DPrintf("0x%02X ", (char) *((char*)(Terminal.symbols.ptrObj + i)));
+	}
+    CLI_DPrintf("\r\nKey Code: 0x%02X", (uint8_t) c);
 #endif
 	if (isValidKey)
 	{
@@ -807,6 +825,22 @@ TC_Result_e CLI_EnterChar(char c)
 						CLI_PutChar(Terminal.buf_enter[Terminal.buf_curPos - 1]);
 					}
 					_RemChar();
+				}
+			}break;
+			case TERM_KEY_HOME:
+			{
+				while(Terminal.buf_curPos > 0)
+				{
+					CLI_PutChar(TERM_KEY_LSHIFT);
+					Terminal.buf_curPos--;
+				}
+			}break;
+			case TERM_KEY_END:
+			{
+				while(Terminal.buf_curPos < Terminal.buf_cntr)
+				{
+					CLI_PutChar(Terminal.buf_enter[Terminal.buf_curPos]);
+					Terminal.buf_curPos++;
 				}
 			}break;
 			default:

@@ -20,14 +20,17 @@
 #define _KEY_INIT(c)					((char)c)
 
 #define TERM_KEY_ENTER					(_KEY_INIT(0x0D))		// Enter command symbol
-#define TERM_KEY_BACKSPACE				(_KEY_INIT(0x7F))		// Delete character before cursor position
+#define TERM_KEY_BACKSPACE				(_KEY_INIT(0x7F))		// Delete character before cursor 
 #define TERM_KEY_LSHIFT					(_KEY_INIT(0x08))		// Left shift symbol
 #define TERM_KEY_ESCAPE					(_KEY_INIT(0xF0))		// Exception execute command symbol
-#define TERM_KEY_UP					(_KEY_INIT(0xF1))		// KeyUp symbol
+#define TERM_KEY_UP						(_KEY_INIT(0xF1))		// KeyUp symbol
 #define TERM_KEY_RIGHT					(_KEY_INIT(0xF2))		// KeyRight symbol
 #define TERM_KEY_DOWN					(_KEY_INIT(0xF3))		// KeyDown symbol
 #define TERM_KEY_LEFT					(_KEY_INIT(0xF4))		// KeyLeft symbol
+#define TERM_KEY_HOME					(_KEY_INIT(0xA0))		// Home key
+#define TERM_KEY_END					(_KEY_INIT(0xA1))		// End key
 #define TERM_KEY_DEL					(_KEY_INIT(0xF5))		// Delete character after cursor position
+#define TERM_KEY_TAB					(_KEY_INIT(0x09))		//
 #define TERM_KEY_RESET					'~'						// Reset CPU
 
 // **************************************************************************
@@ -49,12 +52,13 @@
 #define TERM_TX_RX_EN					(1)			// Terminal Printf (without this don,t work)
 #define TERM_TX_RX_DEB_EN				(1)			// Addition debug printf
 #define TERM_CMD_LOG_EN					(1)			// Command logging
+#define TERM_CMD_AUTOCMPLT_EN			(1)			// Command AutoComplete
 #define TERM_LR_KEY_EN					(1)			// Move cursor left-rigth
 #define TERM_DEFAULT_ALLOC_EN			(1)			// Default Memory Allocate functions
 #define TERM_DEFAULT_STRING_EN			(1)			// Default String functions
 #define TERM_PRINT_ERROR_EXEC_EN		(1)			// Print error after execute command
 #define TERM_PRINT_ERROR_ADD_CMD_EN		(1)			// Print error after added command
-#define ECHO_EN					(1)					// Enter echo enable
+#define ECHO_EN							(1)			// Enter echo enable
 
 // **************************************************************************
 
@@ -64,8 +68,8 @@
 #include <stdio.h>
 extern void COM_Print(const char* str);
 extern char dbgbuffer[256];
-#define COM_Printf(...){sprintf(dbgbuffer,__VA_ARGS__);COM_Print(dbgbuffer);}
-#define CLI_Printf		COM_Printf
+#define COM_Printf(...)		{sprintf(dbgbuffer,__VA_ARGS__);COM_Print(dbgbuffer);}
+#define CLI_Printf			COM_Printf
 extern void COM_Putc(char c);
 #if (ECHO_EN == 1)
 #define CLI_PutChar		COM_Putc
@@ -94,13 +98,13 @@ extern void COM_Putc(char c);
 #if (TERM_TIMELEFT_EN == 1)
 
 	// yout implementation
-extern volatile uint64_t SysTickCtr;							// Переменная содержит счетчик тактов
+extern volatile uint64_t SysTickCtr;							// Variable tackts cntr
 
-#define Terminal_GetUs()			((float)SysTickCtr * 10)	// Функция возвращающая системное время в us
-#define Terminal_GetFastUs()		(SysTickCtr << 3)			// Функция возвращающая системное время в us (не точное)
-#define Terminal_GetMs()			((float)SysTickCtr / 100)	// Функция возвращающая системное время в ms
-#define Terminal_GetFastMs()		(SysTickCtr >> 7)			// Функция возвращающая системное время в ms (не точное)
-#define SysTimeReset()				{SysTickCtr = 0;}			// Функция сбрасывающая системное время
+#define Terminal_GetUs()			((float)SysTickCtr * 10)	// System time in us
+#define Terminal_GetFastUs()		(SysTickCtr << 3)			// System time in us (not exact)
+#define Terminal_GetMs()			((float)SysTickCtr / 100)	// System time in ms
+#define Terminal_GetFastMs()		(SysTickCtr >> 7)			// System time in ms (not exact)
+#define SysTimeReset()				{SysTickCtr = 0;}			// Reset System time
 #define delay_ms(ms)				{uint32_t ms_cntr_67 = Terminal_GetMs(); while(((uint32_t)Terminal_GetMs() - ms_cntr_67) < (ms)) {}}
 #define delay_us(us)				{uint32_t us_cntr_67 = Terminal_GetUs(); while(((uint32_t)Terminal_GetUs() - us_cntr_67) < (us)) {}}
 
@@ -108,8 +112,11 @@ extern volatile uint64_t SysTickCtr;							// Переменная содержит счетчик тактов
 
 #define Terminal_GetUs()			(0)
 #define Terminal_GetMs()			(0)
+#define Terminal_GetFastUs()		(0)
+#define Terminal_GetFastMs()		(0)
 #define SysTimeReset()				{}
 #define delay_ms(ms)				{}
+#define delay_us(us)				{}
 
 #endif	// TERM_TIMELEFT_EN == 1
 
@@ -118,9 +125,9 @@ extern volatile uint64_t SysTickCtr;							// Переменная содержит счетчик тактов
 // ********************** memory allocate functions *************************
 
 #if (TERM_DEFAULT_ALLOC_EN == 1)
-#include "lib/cli_malloc.h"
-#define cli_malloc		_malloc
-#define cli_free		_free
+#include <malloc.h>
+#define cli_malloc		malloc
+#define cli_free		free
 #else
 #define cli_malloc		// your implementation
 #define cli_free		// your implementation

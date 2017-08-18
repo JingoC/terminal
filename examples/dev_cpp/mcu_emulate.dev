@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=00000000e0000000001000000
-UnitCount=16
+UnitCount=14
 
 [VersionInfo]
 Major=1
@@ -60,47 +60,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit2]
-FileName=..\..\lib\cli_malloc.c
-CompileCpp=0
-Folder=terminal/lib
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit3]
-FileName=..\..\lib\cli_malloc.h
-CompileCpp=0
-Folder=terminal/lib
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit4]
-FileName=..\..\lib\cli_queue.c
-CompileCpp=0
-Folder=terminal/lib
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit5]
-FileName=..\..\lib\cli_queue.h
-CompileCpp=0
-Folder=terminal/lib
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit6]
 FileName=..\..\lib\cli_string.c
 CompileCpp=0
 Folder=terminal/lib
@@ -110,7 +70,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit7]
+[Unit5]
 FileName=..\..\lib\cli_string.h
 CompileCpp=0
 Folder=terminal/lib
@@ -120,7 +80,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit8]
+[Unit6]
 FileName=..\..\module\cli_log.c
 CompileCpp=0
 Folder=terminal/module
@@ -130,7 +90,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit9]
+[Unit7]
 FileName=..\..\module\cli_log.h
 CompileCpp=0
 Folder=terminal/module
@@ -140,7 +100,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit10]
+[Unit8]
 FileName=..\..\module\cli_time.c
 CompileCpp=0
 Folder=terminal/module
@@ -150,7 +110,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit11]
+[Unit9]
 FileName=..\..\module\cli_time.h
 CompileCpp=0
 Folder=terminal/module
@@ -160,7 +120,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit12]
+[Unit10]
 FileName=..\..\terminal.c
 CompileCpp=0
 Folder=terminal
@@ -170,7 +130,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit13]
+[Unit11]
 FileName=..\..\terminal.h
 CompileCpp=0
 Folder=terminal
@@ -180,10 +140,30 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit14]
+[Unit12]
 FileName=com\com.c
 CompileCpp=0
 Folder=com
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit13]
+FileName=com\com.h
+CompileCpp=0
+Folder=com
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit14]
+FileName=terminal_config.h
+CompileCpp=0
+Folder=terminal
 Compile=1
 Link=1
 Priority=1000
@@ -204,6 +184,26 @@ BuildCmd=
 FileName=terminal_config.h
 CompileCpp=0
 Folder=terminal
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit2]
+FileName=..\..\lib\cli_queue.c
+CompileCpp=0
+Folder=terminal/lib
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit3]
+FileName=..\..\lib\cli_queue.h
+CompileCpp=0
+Folder=terminal/lib
 Compile=1
 Link=1
 Priority=1000

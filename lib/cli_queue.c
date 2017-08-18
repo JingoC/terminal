@@ -1,5 +1,5 @@
 #include "cli_queue.h"
-#include "cli_malloc.h"
+#include "terminal_config.h"
 
 #include "stdlib.h"
 #include "string.h"
@@ -7,14 +7,14 @@
 void Q_Free(QueueObj* qdObj)
 {
 	Queue_s* qd = (Queue_s*) qdObj;
-    _free(qd->ptrObj);
+    cli_free(qd->ptrObj);
 }
 
 void Q_Init(QueueObj* qdObj, uint16_t sizeQueue, uint8_t sizeObj, uint32_t mode)
 {
 	Queue_s* qd = (Queue_s*) qdObj;
 
-    qd->ptrObj = (void*) _malloc(sizeObj * sizeQueue);
+    qd->ptrObj = (void*) cli_malloc(sizeObj * sizeQueue);
 
     if (qd->ptrObj == NULL)
     {
