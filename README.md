@@ -8,7 +8,7 @@ Flexible terminal settings allow you to integrate it with any microcontroller, w
 + Platform detachment
 + Logging commands
 + The mechanism for aborting execution
-+ Available keys KeyLeft, KeyRight, Delete, BackSpace
++ Available keys KeyLeft, KeyRight, Delete, BackSpace, Home, End, Tab
 
 Required space in the program memory with a minimum working configuration of ~ 10 KB
 
