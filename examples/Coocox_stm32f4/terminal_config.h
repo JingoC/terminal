@@ -51,7 +51,7 @@ extern void _reset_fcn();
 
 #define TERM_TIMELEFT_EN				(1)			// Calculate time
 #define TERM_TX_RX_EN					(1)			// Terminal Printf (without this don,t work)
-#define TERM_TX_RX_DEB_EN				(1)			// Addition debug printf
+#define TERM_TX_RX_DEB_EN				(0)			// Addition debug printf
 #define TERM_CMD_LOG_EN					(1)			// Command logging
 #define TERM_CMD_AUTOCMPLT_EN			(1)			// Command AutoComplete
 #define TERM_LR_KEY_EN					(1)			// Move cursor left-rigth
@@ -101,20 +101,17 @@ extern char dbgbuffer[256];
 	// yout implementation
 extern volatile uint64_t SysTickCtr;							// Variable tackts cntr
 
-#define Terminal_GetUs()			((float)SysTickCtr * 10)	// System time in us
-#define Terminal_GetFastUs()		(SysTickCtr << 3)			// System time in us (not exact)
-#define Terminal_GetMs()			((float)SysTickCtr / 100)	// System time in ms
-#define Terminal_GetFastMs()		(SysTickCtr >> 7)			// System time in ms (not exact)
-#define SysTimeReset()				{SysTickCtr = 0;}			// Reset System time
-#define delay_ms(ms)				{uint32_t ms_cntr_67 = Terminal_GetMs(); while(((uint32_t)Terminal_GetMs() - ms_cntr_67) < (ms)) {}}
-#define delay_us(us)				{uint32_t us_cntr_67 = Terminal_GetUs(); while(((uint32_t)Terminal_GetUs() - us_cntr_67) < (us)) {}}
+#define CLI_GetUs()					((float)SysTickCtr * 10)	// System time in us
+#define CLI_GetFastUs()				(SysTickCtr << 3)			// System time in us (not exact)
+#define CLI_GetFastMs()				(SysTickCtr >> 7)			// System time in ms (not exact)
+#define CLI_CounterReset()			{SysTickCtr = 0;}
 
 #else	// TERM_TIMELEFT_EN != 1
 
-#define Terminal_GetUs()			(0)
-#define Terminal_GetMs()			(0)
-#define SysTimeReset()				{}
-#define delay_ms(ms)				{}
+#define CLI_GetUs()					(0)			// System time in us
+#define CLI_GetFastUs()				(0)			// System time in us (not exact)
+#define CLI_GetFastMs()				(0)			// System time in ms (not exact)
+#define CLI_CounterReset()			{}
 
 #endif	// TERM_TIMELEFT_EN == 1
 

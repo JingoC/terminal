@@ -56,9 +56,9 @@
 #define TERM_LR_KEY_EN					(0)			// Move cursor left-rigth
 #define TERM_DEFAULT_ALLOC_EN			(1)			// Default Memory Allocate functions
 #define TERM_DEFAULT_STRING_EN			(1)			// Default String functions
-#define TERM_PRINT_ERROR_EXEC_EN		(1)			// Print error after execute command
-#define TERM_PRINT_ERROR_ADD_CMD_EN		(1)			// Print error after added command
-#define ECHO_EN					(1)					// Enter echo enable
+#define TERM_PRINT_ERROR_EXEC_EN		(0)			// Print error after execute command
+#define TERM_PRINT_ERROR_ADD_CMD_EN		(0)			// Print error after added command
+#define ECHO_EN							(1)			// Enter echo enable
 
 // **************************************************************************
 
@@ -101,23 +101,17 @@ extern void UART_PutChar(char c);
 	// yout implementation
 extern volatile uint64_t SysTickCtr;							// Variable tackts cntr
 
-#define Terminal_GetUs()			((float)SysTickCtr * 10)	// System time in us
-#define Terminal_GetFastUs()		(SysTickCtr << 3)			// System time in us (not exact)
-#define Terminal_GetMs()			((float)SysTickCtr / 100)	// System time in ms
-#define Terminal_GetFastMs()		(SysTickCtr >> 7)			// System time in ms (not exact)
-#define SysTimeReset()				{SysTickCtr = 0;}			// Reset System time
-#define delay_ms(ms)				{uint32_t ms_cntr_67 = Terminal_GetMs(); while(((uint32_t)Terminal_GetMs() - ms_cntr_67) < (ms)) {}}
-#define delay_us(us)				{uint32_t us_cntr_67 = Terminal_GetUs(); while(((uint32_t)Terminal_GetUs() - us_cntr_67) < (us)) {}}
+#define CLI_GetUs()					((float)SysTickCtr * 10)	// System time in us
+#define CLI_GetFastUs()				(SysTickCtr << 3)			// System time in us (not exact)
+#define CLI_GetFastMs()				(SysTickCtr >> 7)			// System time in ms (not exact)
+#define CLI_CounterReset()			{SysTickCtr = 0;}
 
 #else	// TERM_TIMELEFT_EN != 1
 
-#define Terminal_GetUs()			(0)
-#define Terminal_GetMs()			(0)
-#define Terminal_GetFastUs()		(0)
-#define Terminal_GetFastMs()		(0)
-#define SysTimeReset()				{}
-#define delay_ms(ms)				{}
-#define delay_us(us)				{}
+#define CLI_GetUs()					(0)			// System time in us
+#define CLI_GetFastUs()				(0)			// System time in us (not exact)
+#define CLI_GetFastMs()				(0)			// System time in ms (not exact)
+#define CLI_CounterReset()			{}
 
 #endif	// TERM_TIMELEFT_EN == 1
 

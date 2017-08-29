@@ -100,10 +100,10 @@
     <File name="cmsis_boot/system_stm32f4xx.c" path="cmsis_boot/system_stm32f4xx.c" type="1"/>
     <File name="my_test_commands" path="" type="2"/>
     <File name="terminal/terminal.h" path="../../terminal.h" type="1"/>
-    <File name="terminal/module/cli_log.h" path="../../module/cli_log.h" type="1"/>
     <File name="cmsis" path="" type="2"/>
-    <File name="cmsis_lib" path="" type="2"/>
+    <File name="terminal/module/cli_log.h" path="../../module/cli_log.h" type="1"/>
     <File name="syscalls/syscalls.c" path="syscalls/syscalls.c" type="1"/>
+    <File name="cmsis_lib" path="" type="2"/>
     <File name="cmsis_lib/source" path="" type="2"/>
     <File name="terminal/lib/cli_string.h" path="../../lib/cli_string.h" type="1"/>
     <File name="cmsis_lib/include/stm32f4xx_gpio.h" path="cmsis_lib/include/stm32f4xx_gpio.h" type="1"/>

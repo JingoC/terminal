@@ -1,9 +1,9 @@
 #include "cli_time.h"
 
-CLI_Time_s _def_time;
+uint32_t _def_time_ms;
 
 /// \brief Generate CLI_Time_s struct from milliseconds
-CLI_Time_s CLI_GenerateTimeMSec(uint32_t msec)
+CLI_Time_s CLI_GetFormatTimeByMs(uint32_t msec)
 {
     CLI_Time_s res;
 	res.msec = msec % 1000;
@@ -17,47 +17,29 @@ CLI_Time_s CLI_GenerateTimeMSec(uint32_t msec)
 	return res;
 }
 
-/// \brief Generate CLI_Time_s struct from seconds
-CLI_Time_s CLI_GenerateTime(uint32_t sec)
+inline void CLI_SetBaseTimeFromMs(uint32_t ms)
 {
-    CLI_Time_s res;
-	res.msec = 0;
-	res.second = sec % 60;
-	uint32_t m = sec / 60;
-	res.minute = m % 60;
-	uint32_t h = sec / 3600;
-	res.hour = h;
-
-	return res;
+	_def_time_ms = ms;
 }
 
-/// \brief Get seconds from CLI_Time_s
-inline uint32_t CLI_GetTime(CLI_Time_s* t)
+inline void CLI_SetBaseTimeFromHMS(uint32_t h, uint32_t m, uint32_t s)
 {
-	uint32_t sec = t->hour * 3600 + t->minute * 60 + t->second;
-	return sec;
+	_def_time_ms = h * 3600000 + m * 60000 + s * 1000;
 }
 
-/// \brief Get milliseconds from CLI_Time_s
-inline uint32_t CLI_GetTimeMSec(CLI_Time_s* t)
+inline CLI_Time_s CLI_GetFormatLastTimeByMs(uint32_t msec)
 {
-	uint32_t sec = t->hour * 3600000 + t->minute * 60000 + t->second * 1000 + t->msec;
-	return sec;
+	return CLI_GetFormatTimeByMs(msec + _def_time_ms);
 }
 
-inline void CLI_SetTimeSec(CLI_Time_s* t, uint32_t sec)
+void CLI_DelayMs(uint32_t ms)
 {
-    *t = CLI_GenerateTime(sec);
+	uint32_t startMs = CLI_GetMs();
+	while(((uint32_t)CLI_GetMs() - startMs) < (ms)) {}
 }
 
-inline void CLI_SetTimeMSec(CLI_Time_s* t, uint32_t msec)
+void CLI_DelayUs(uint32_t us)
 {
-    *t = CLI_GenerateTimeMSec(msec);
-}
-
-inline void CLI_SetTime(CLI_Time_s* t, uint32_t h , uint8_t m , uint8_t s)
-{
-	t->hour = h;// % 24;
-	t->minute = m % 60;
-	t->second = s % 60;
+	uint32_t startUs = CLI_GetUs();
+	while(((uint32_t)CLI_GetUs() - startUs) < (us)) {}
 }

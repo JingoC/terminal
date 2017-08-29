@@ -22,13 +22,15 @@ extern uint8_t _strPartCmp(const char* str1, const char* str2);
 
 static uint8_t _help_cmd();
 static uint8_t _reset_cpu();
+
+#if (TERM_TIMELEFT_EN == 1)
 static uint8_t _settime_cmd();
 static uint8_t _gettime_cmd();
+#endif
+
 static uint8_t _cpur_cmd();
 static uint8_t _cpuw_cmd();
 static uint8_t _cpurb_cmd();
-
-extern CLI_Time_s _def_time;
 
 // ************************* interrupt function ***************************
 
@@ -96,18 +98,18 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
     Terminal.buf_enter_exec[TERM_CMD_BUF_SIZE] = '\0';
     Terminal.executeState = 0;
     Terminal.isEntered = false;
-    
-
-    CLI_SetTime(&_def_time, 0, 0, 0);
 
     CLI_AddCmd("help", 		_help_cmd, 		0, TMC_None, "help by terminal command");
     CLI_AddCmd("~", 		_reset_cpu, 	0, TMC_None, "reset cpu");
 
+#if (TERM_TIMELEFT_EN == 1)
+    CLI_SetBaseTimeFromMs(0);
     if (defCmd & TDC_Time)
     {
         CLI_AddCmd("settime", 	_settime_cmd, 	3, TMC_None, "set current time\n\r\tsettime [h] [m] [s]");
         CLI_AddCmd("gettime", 	_gettime_cmd, 	0, TMC_None, "print current time");
     }
+#endif
 
     if (defCmd & TDC_CPU)
     {
@@ -217,16 +219,16 @@ TE_Result_e _Execute(char** argv, uint8_t argc)
 		if (cmd->mode & TMC_PrintStartTime)
 			CLI_PrintTime();
     	
-		uint32_t startMs = Terminal_GetMs();
+		uint32_t startMs = CLI_GetMs();
 		TE_Result_e result = cmd->fcn(argv, argc);
-		uint32_t stopMs = Terminal_GetMs();
+		uint32_t stopMs = CLI_GetMs();
 		
 		if (cmd->mode & TMC_PrintStopTime)
 			CLI_PrintTime();
 		
 		if (cmd->mode & TMC_PrintDiffTime)
 		{
-			CLI_Time_s t = CLI_GenerateTimeMSec(stopMs - startMs);
+			CLI_Time_s t = CLI_GetFormatTimeByMs(stopMs - startMs);
 			_PrintTime(&t);
 		}
 	
@@ -429,15 +431,14 @@ uint8_t _reset_cpu()
 	return TE_OK;
 }
 
+#if (TERM_TIMELEFT_EN == 1)
 uint8_t _settime_cmd()
 {
     uint32_t h = CLI_GetArgDec(0);
     uint8_t m = CLI_GetArgDec(1);
     uint8_t s = CLI_GetArgDec(2);
 
-	SysTimeReset();
-
-    CLI_SetTime(&_def_time, h, m, s);
+	CLI_SetBaseTimeFromHMS(h, m , s);
 
 	return TE_OK;
 }
@@ -449,6 +450,7 @@ uint8_t _gettime_cmd()
 
 	return TE_OK;
 }
+#endif
 
 uint8_t _cpur_cmd()
 {
@@ -495,18 +497,22 @@ void _PrintTime(CLI_Time_s* t)
 /// \return none
 void CLI_PrintTime()
 {
-	uint32_t ms = Terminal_GetMs();
-    CLI_Time_s t = CLI_GenerateTimeMSec(CLI_GetTimeMSec(&_def_time) + ms);
+#if (TERM_TIMELEFT_EN == 1)
+	uint32_t ms = CLI_GetMs();
+    CLI_Time_s t = CLI_GetFormatLastTimeByMs(ms);
     _PrintTime(&t);
+#endif
 }
 
 /// \brief Вывод текущего времени в терминал без перевода строки
 /// \return none
 void CLI_PrintTimeWithoutRN()
 {
-	uint32_t ms = Terminal_GetMs();
-    CLI_Time_s t = CLI_GenerateTimeMSec(CLI_GetTimeMSec(&_def_time) + ms);
+#if (TERM_TIMELEFT_EN == 1)
+	uint32_t ms = CLI_GetMs();
+    CLI_Time_s t = CLI_GetFormatLastTimeByMs(ms);
 	_PrintTime(&t);
+#endif
 }
 
 static void _UpdateCmd(const char* newCmd)

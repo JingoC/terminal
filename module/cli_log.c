@@ -62,10 +62,10 @@ const char* CLI_LogCmdGet(uint8_t index)
 
 const char* CLI_GetNextCmd()
 {
-	if (TermLog._curCmd < (TermLog._cntCmd - 1))
+	if (TermLog._curCmd < TermLog._cntCmd - 1)
 	{
 		TermLog._curCmd++;
-		return &TermLog.cmds[TermLog._curCmd][0];;
+		return &TermLog.cmds[TermLog._curCmd][0];
 	}
 
 	return NULL;
@@ -73,7 +73,6 @@ const char* CLI_GetNextCmd()
 
 const char* CLI_GetLastCmd()
 {
-
 	if (TermLog._curCmd > 0)
 	{
 		TermLog._curCmd--;
