@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Project version="2G - 2.0.7" name="lpc1227">
+  <Target name="lpc1227" isCurrent="1">
+    <Device manufacturerId="7" manufacturerName="NXP" chipId="149" chipName="LPC1227x301" boardId="" boardName=""/>
+    <BuildOption>
+      <Compile>
+        <Option name="OptimizationLevel" value="1"/>
+        <Option name="UseFPU" value="0"/>
+        <Option name="UserEditCompiler" value="-std=c99"/>
+        <Option name="SupportCPlusplus" value="0"/>
+        <Includepaths>
+          <Includepath path="."/>
+          <Includepath path="../.."/>
+        </Includepaths>
+        <DefinedSymbols>
+          <Define name="LPC1227x301"/>
+        </DefinedSymbols>
+      </Compile>
+      <Link useDefault="0">
+        <Option name="DiscardUnusedSection" value="0"/>
+        <Option name="UserEditLinkder" value=""/>
+        <Option name="UseMemoryLayout" value="1"/>
+        <Option name="nostartfiles" value="1"/>
+        <Option name="LTO" value="0"/>
+        <Option name="IsNewStartupCode" value="1"/>
+        <Option name="Library" value="Not use C Library"/>
+        <LinkedLibraries/>
+        <MemoryAreas debugInFlashNotRAM="1">
+          <Memory name="IROM1" type="ReadOnly" size="0x00020000" startValue="0x00000000"/>
+          <Memory name="IRAM1" type="ReadWrite" size="0x00002000" startValue="0x10000000"/>
+          <Memory name="IROM2" type="ReadOnly" size="" startValue=""/>
+          <Memory name="IRAM2" type="ReadWrite" size="" startValue=""/>
+        </MemoryAreas>
+        <LocateLinkFile path="c:/coocox/coide/configuration/programdata/lpc1227/arm-gcc-link.ld" type="0"/>
+      </Link>
+      <Output>
+        <Option name="OutputFileType" value="0"/>
+        <Option name="Path" value="./"/>
+        <Option name="Name" value="lpc1227"/>
+        <Option name="HEX" value="1"/>
+        <Option name="BIN" value="1"/>
+      </Output>
+      <User>
+        <UserRun name="Run#1" type="Before" checked="0" value=""/>
+        <UserRun name="Run#1" type="After" checked="0" value=""/>
+      </User>
+    </BuildOption>
+    <DebugOption>
+      <Option name="org.coocox.codebugger.gdbjtag.core.adapter" value="J-Link"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.debugMode" value="SWD"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.clockDiv" value="1M"/>
+      <Option name="org.coocox.codebugger.gdbjtag.corerunToMain" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkgdbserver" value="D:\PROJECTS\NIIKP_Hexagon\_SVN\trunk\Soft\Coocox\lpc1227\loader\jlink\JLinkGDBServerCL.exe"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.userDefineGDBScript" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.targetEndianess" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkResetMode" value="Type 0: Normal"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.resetMode" value="SYSRESETREQ"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifSemihost" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifCacheRom" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ipAddress" value="127.0.0.1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.portNumber" value="2331"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.autoDownload" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.verify" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.downloadFuction" value="Erase Effected"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="LPC122x_128.elf"/>
+      <Option name="org.coocox.codebugger.gdbjtag.coredebugInRamInitCommands" value="cd W:/PROJECTS/NIIKP_Hexagon/trunk/Soft/Coocox/imcu/imcu/Debug/bin restore imcu.elf set {unsigned int*}0xE000ED08 = 0x10000000 set $sp = {unsigned int*}0x10000000 set $pc = {unsigned int*}0x10000004 "/>
+    </DebugOption>
+    <ExcludeFile/>
+  </Target>
+  <Components path="./"/>
+  <Files>
+    <File name="terminal/module/cli_time.h" path="../../module/cli_time.h" type="1"/>
+    <File name="terminal/lib/cli_queue.c" path="Z:/terminal/lib/cli_queue.c" type="1"/>
+    <File name="terminal" path="" type="2"/>
+    <File name="lib/cmsis/syscalls/syscalls.c" path="lib/cmsis/syscalls/syscalls.c" type="1"/>
+    <File name="lib/cmsis/syscalls" path="" type="2"/>
+    <File name="terminal/terminal_config.h" path="terminal_config.h" type="1"/>
+    <File name="terminal/module/cli_log.c" path="../../module/cli_log.c" type="1"/>
+    <File name="lib/cmsis/cmsis_boot/system_LPC12xx.c" path="lib/cmsis/cmsis_boot/system_LPC12xx.c" type="1"/>
+    <File name="lib/cmsis/cmsis_lib/lpc12xx_uart.c" path="lib/cmsis/cmsis_lib/lpc12xx_uart.c" type="1"/>
+    <File name="lib/cmsis/cmsis_lib/lpc12xx_gpio.c" path="lib/cmsis/cmsis_lib/lpc12xx_gpio.c" type="1"/>
+    <File name="lib/cmsis/cmsis_core/core_cm0.h" path="lib/cmsis/cmsis_core/core_cm0.h" type="1"/>
+    <File name="lib/cmsis/cmsis_core/core_cmFunc.h" path="lib/cmsis/cmsis_core/core_cmFunc.h" type="1"/>
+    <File name="lib/cmsis/cmsis_lib/lpc12xx_sysctrl.h" path="lib/cmsis/cmsis_lib/lpc12xx_sysctrl.h" type="1"/>
+    <File name="lib/cmsis/cmsis_lib" path="" type="2"/>
+    <File name="lib/cmsis/cmsis_core/core_cmInstr.h" path="lib/cmsis/cmsis_core/core_cmInstr.h" type="1"/>
+    <File name="my_test_commands/my_test_commands.h" path="my_test_commands/my_test_commands.h" type="1"/>
+    <File name="my_test_commands" path="" type="2"/>
+    <File name="lib/cmsis/cmsis_core" path="" type="2"/>
+    <File name="lib/cmsis/cmsis_lib/lpc12xx_iocon.h" path="lib/cmsis/cmsis_lib/lpc12xx_iocon.h" type="1"/>
+    <File name="terminal/terminal.h" path="../../terminal.h" type="1"/>
+    <File name="terminal/module/cli_log.h" path="../../module/cli_log.h" type="1"/>
+    <File name="lib/cmsis/cmsis_lib/lpc12xx_uart.h" path="lib/cmsis/cmsis_lib/lpc12xx_uart.h" type="1"/>
+    <File name="lib/cmsis/cmsis_lib/lpc12xx_sysctrl.c" path="lib/cmsis/cmsis_lib/lpc12xx_sysctrl.c" type="1"/>
+    <File name="terminal/lib/cli_string.h" path="Z:/terminal/lib/cli_string.h" type="1"/>
+    <File name="lib/cmsis/cmsis_boot/system_LPC12xx.h" path="lib/cmsis/cmsis_boot/system_LPC12xx.h" type="1"/>
+    <File name="lib/cmsis/cmsis_boot" path="" type="2"/>
+    <File name="lib/cmsis/cmsis_lib/lpc_types.h" path="lib/cmsis/cmsis_lib/lpc_types.h" type="1"/>
+    <File name="lib/cmsis/cmsis_lib/lpc12xx_iocon.c" path="lib/cmsis/cmsis_lib/lpc12xx_iocon.c" type="1"/>
+    <File name="terminal/module/cli_time.c" path="../../module/cli_time.c" type="1"/>
+    <File name="terminal/module" path="" type="2"/>
+    <File name="lib/cmsis/cmsis_lib/lpc12xx_gpio.h" path="lib/cmsis/cmsis_lib/lpc12xx_gpio.h" type="1"/>
+    <File name="terminal/terminal.c" path="../../terminal.c" type="1"/>
+    <File name="global_inc.h" path="global_inc.h" type="1"/>
+    <File name="terminal/lib/cli_string.c" path="Z:/terminal/lib/cli_string.c" type="1"/>
+    <File name="terminal/lib" path="" type="2"/>
+    <File name="lib/cmsis" path="" type="2"/>
+    <File name="terminal/lib/cli_queue.h" path="Z:/terminal/lib/cli_queue.h" type="1"/>
+    <File name="lib" path="" type="2"/>
+    <File name="lib/cmsis/cmsis_lib/lpc12xx_libcfig.h" path="lib/cmsis/cmsis_lib/lpc12xx_libcfig.h" type="1"/>
+    <File name="main.c" path="main.c" type="1"/>
+    <File name="my_test_commands/my_test_commands.c" path="my_test_commands/my_test_commands.c" type="1"/>
+    <File name="lib/cmsis/cmsis_boot/startup/startup_lpc12xx.c" path="lib/cmsis/cmsis_boot/startup/startup_lpc12xx.c" type="1"/>
+    <File name="lib/cmsis/cmsis_boot/LPC12xx.h" path="lib/cmsis/cmsis_boot/LPC12xx.h" type="1"/>
+    <File name="lib/cmsis/cmsis_boot/startup" path="" type="2"/>
+  </Files>
+</Project>
