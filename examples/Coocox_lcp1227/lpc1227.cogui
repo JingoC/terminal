@@ -25,7 +25,7 @@
 </folder>
 </info>
 </editorArea>
-<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="W:/terminal/examples/Coocox_lcp1227/main.c" title="main.c" tooltip="W:/terminal/examples/Coocox_lcp1227/main.c" workbook="DefaultEditorWorkbook">
+<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="D:/gitclone/terminal/examples/Coocox_lcp1227/main.c" title="main.c" tooltip="D:/gitclone/terminal/examples/Coocox_lcp1227/main.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/lpc1227/main.c"/>
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="364" selectionTopPixel="0"/>
 </editor>
@@ -59,6 +59,7 @@
 <viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="0">
 <expanded>
 <element path="/lpc1227"/>
+<element path="/lpc1227/terminal"/>
 </expanded>
 </viewState>
 </view>
@@ -76,6 +77,9 @@
 </view>
 <view id="org.eclipse.ui.views.ProblemView" partName="Problems">
 <viewState PRIMARY_SORT_FIELD="org.eclipse.ui.ide.severityAndDescriptionField" categoryGroup="org.eclipse.ui.ide.severity" markerContentGenerator="org.eclipse.ui.ide.problemsGenerator" partName="Problems">
+<expanded>
+<category IMemento.internal.id="Warnings (1 item)"/>
+</expanded>
 <columnWidths org.eclipse.ui.ide.locationField="90" org.eclipse.ui.ide.markerType="90" org.eclipse.ui.ide.pathField="120" org.eclipse.ui.ide.resourceField="90" org.eclipse.ui.ide.severityAndDescriptionField="300"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.severityAndDescriptionField"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.resourceField"/>
@@ -91,7 +95,7 @@
 <viewState/>
 </view>
 </views>
-<perspectives activePart="org.eclipse.cdt.ui.editor.CEditor" activePerspective="org.coocox.builder.perspective.CoBuilder">
+<perspectives activePart="org.coocox.builder.ui.views.ProjectView" activePerspective="org.coocox.builder.perspective.CoBuilder">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.coocox.builder.ui.PerspectiveCoBuilder" id="org.coocox.builder.perspective.CoBuilder" label="CooCox CoBuilder"/>
 <alwaysOnActionSet id="org.coocox.welcome.ui.actionSet"/>
@@ -435,47 +439,47 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="cli_time.c" tooltip="lpc1227/terminal/module/cli_time.c">
-<persistable path="/lpc1227/terminal/module/cli_time.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="terminal_config.h" tooltip="stm32f4_terminal_example/terminal/terminal_config.h">
+<persistable path="/stm32f4_terminal_example/terminal/terminal_config.h"/>
 </file>
-<file factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="cli_queue.h" tooltip="W:\terminal\lib\cli_queue.h">
-<persistable path="W:\terminal\lib\cli_queue.h" project="lpc1227"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="imcu_tests.c" tooltip="test_mcu/imcu_test/imcu_tests.c">
+<persistable path="/test_mcu/imcu_test/imcu_tests.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="terminal_config.h" tooltip="lpc1227/terminal/terminal_config.h">
-<persistable path="/lpc1227/terminal/terminal_config.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="my_test_commands.c" tooltip="stm32f4_terminal_example/my_test_commands/my_test_commands.c">
+<persistable path="/stm32f4_terminal_example/my_test_commands/my_test_commands.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="terminal.h" tooltip="lpc1227/terminal/terminal.h">
-<persistable path="/lpc1227/terminal/terminal.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="imcu.c" tooltip="test_mcu/mcu/imcu.c">
+<persistable path="/test_mcu/mcu/imcu.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="my_test_commands.c" tooltip="lpc1227/my_test_commands/my_test_commands.c">
-<persistable path="/lpc1227/my_test_commands/my_test_commands.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_usart.c" tooltip="stm32f4_terminal_example/cmsis_lib/source/stm32f4xx_usart.c">
+<persistable path="/stm32f4_terminal_example/cmsis_lib/source/stm32f4xx_usart.c"/>
 </file>
-<file factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="cli_string.h" tooltip="W:\terminal\lib\cli_string.h">
-<persistable path="W:\terminal\lib\cli_string.h" project="lpc1227"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="startup_stm32f4xx.c" tooltip="stm32f4_terminal_example/cmsis_boot/startup/startup_stm32f4xx.c">
+<persistable path="/stm32f4_terminal_example/cmsis_boot/startup/startup_stm32f4xx.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="core_cm0.h" tooltip="lpc1227/lib/cmsis/cmsis_core/core_cm0.h">
-<persistable path="/lpc1227/lib/cmsis/cmsis_core/core_cm0.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="system_stm32f4xx.c" tooltip="stm32f4_terminal_example/cmsis_boot/system_stm32f4xx.c">
+<persistable path="/stm32f4_terminal_example/cmsis_boot/system_stm32f4xx.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="startup_lpc12xx.c" tooltip="lpc1227/lib/cmsis/cmsis_boot/startup/startup_lpc12xx.c">
-<persistable path="/lpc1227/lib/cmsis/cmsis_boot/startup/startup_lpc12xx.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="core_cm4.h" tooltip="stm32f4_terminal_example/cmsis/core_cm4.h">
+<persistable path="/stm32f4_terminal_example/cmsis/core_cm4.h"/>
 </file>
-<file factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="cli_queue.h" tooltip="Z:\terminal\lib\cli_queue.h">
-<persistable path="Z:\terminal\lib\cli_queue.h" project="lpc1227"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="terminal.c" tooltip="stm32f4_terminal_example/terminal/terminal.c">
+<persistable path="/stm32f4_terminal_example/terminal/terminal.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="terminal.c" tooltip="lpc1227/terminal/terminal.c">
-<persistable path="/lpc1227/terminal/terminal.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx.h" tooltip="stm32f4_terminal_example/cmsis_boot/stm32f4xx.h">
+<persistable path="/stm32f4_terminal_example/cmsis_boot/stm32f4xx.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="uart.c" tooltip="lpc1227/lib/uart/uart.c">
-<persistable path="/lpc1227/lib/uart/uart.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="core_cmFunc.h" tooltip="stm32f4_terminal_example/cmsis/core_cmFunc.h">
+<persistable path="/stm32f4_terminal_example/cmsis/core_cmFunc.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="uart.h" tooltip="lpc1227/lib/uart/uart.h">
-<persistable path="/lpc1227/lib/uart/uart.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_rcc.h" tooltip="stm32f4_terminal_example/cmsis_lib/include/stm32f4xx_rcc.h">
+<persistable path="/stm32f4_terminal_example/cmsis_lib/include/stm32f4xx_rcc.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio.h" tooltip="lpc1227/lib/gpio/gpio.h">
-<persistable path="/lpc1227/lib/gpio/gpio.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_gpio.h" tooltip="stm32f4_terminal_example/cmsis_lib/include/stm32f4xx_gpio.h">
+<persistable path="/stm32f4_terminal_example/cmsis_lib/include/stm32f4xx_gpio.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio.c" tooltip="lpc1227/lib/gpio/gpio.c">
-<persistable path="/lpc1227/lib/gpio/gpio.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_usart.h" tooltip="stm32f4_terminal_example/cmsis_lib/include/stm32f4xx_usart.h">
+<persistable path="/stm32f4_terminal_example/cmsis_lib/include/stm32f4xx_usart.h"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio.c" tooltip="lpc1227/lib/gpio/gpio.c">
 <persistable path="/lpc1227/lib/gpio/gpio.c"/>

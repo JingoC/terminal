@@ -8,3 +8,9 @@
 /examples/Proteus_emulate/atmega32/src_prj/default/atmega32_terminal.map
 /examples/Proteus_emulate/atmega32/src_prj/default/atmega32_terminal.lss
 /examples/Proteus_emulate/atmega32/src_prj/default/atmega32_terminal.eep
+/examples/Coocox_lcp1227/lpc1227/Debug/obj
+/examples/Coocox_lcp1227/lpc1227/Debug/bin/history.xml
+/examples/Coocox_lcp1227/lpc1227/Debug/bin/lpc1227.map
+/examples/Coocox_lcp1227/lpc1227/Debug/bin/lpc1227.elf
+/examples/Coocox_lcp1227/lpc1227/Debug/bin/lpc1227.hex
+/examples/Coocox_lcp1227/lpc1227/lpc1227.elf.xcodeproj/project.pbxproj
