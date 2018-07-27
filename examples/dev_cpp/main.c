@@ -6,6 +6,9 @@
 #include "terminal_config.h"
 #include "terminal.h"
 
+static uint8_t _to_cmd();
+static uint8_t _tf_cmd();
+
 void ReceiveControl()
 {
 	char c = 0;
@@ -13,33 +16,51 @@ void ReceiveControl()
 	   CLI_EnterChar(c);
 }
 
-uint8_t _t1_cmd()
-{	
-	uint32_t a = 0x01;
-	uint32_t b = 0x10;
-	uint32_t c = 7;
-	
+void delay_cnt(uint32_t cnt)
+{
+	while(cnt-- > 0)
+	{
+		asm("nop");
+	}
+}
+
+uint8_t _to_cmd()
+{
+	uint32_t count = 1;
+
 	// be sure arguments
-	c = CLI_GetArgDec(0);
-	
+	count = CLI_GetArgDec(0);
+
 	// optional arguments
-	CLI_GetArgHexByFlag("-a", &a);
-	CLI_GetArgHexByFlag("-b", &b);
-	
-	CLI_Printf("\r\na: 0x%08X\r\nb: 0x%08X\r\nc: %d", a, b, c);
-	
+	//CLI_GetArgHexByFlag("-b", &b);
+
+	for(uint32_t i = 0; i < count; i++)
+	{
+		CLI_Printf("\r\n|  Test%d  |  OK  |", (int) i);
+		delay_cnt(500000000);
+	}
+
 	return TE_OK;
 }
 
-uint8_t _t2_cmd()
+uint8_t _tf_cmd()
 {
-	CLI_Printf("\r\nPress ESC");
-	while(1)
+	// be sure arguments
+	uint32_t count = CLI_GetArgDec(0);
+
+	// optional arguments
+	//CLI_GetArgHexByFlag("-b", &b);
+
+	for(uint32_t i = 0; i < count; i++)
 	{
-		CLI_CheckAbort();
-		ReceiveControl();
+		if (i < 2) {
+			CLI_Printf("\r\n|  Test%d  |  OK  |", (int) i);
+		}
+		else {
+			CLI_Printf("\r\n|  Test%d  | FAIL |", (int) i);
+		}
+		delay_cnt(500000000);
 	}
-	
 	return TE_OK;
 }
 
@@ -49,8 +70,8 @@ int main(int argc, char *argv[]) {
 	{	
 		CLI_Init(TDC_Time);
 		
-		CLI_AddCmd("t1", _t1_cmd, 1, TMC_PrintStartTime | TMC_PrintStopTime, "t1 - description command");
-		CLI_AddCmd("t2", _t2_cmd, 0, TMC_PrintDiffTime, "t2 - description command");
+		CLI_AddCmd("test_ok", _to_cmd, 1, TMC_PrintDiffTime, "test ok");
+		CLI_AddCmd("test_fail", _tf_cmd, 1, TMC_PrintDiffTime, "test fail");
 	
 		while(1)
 		{
