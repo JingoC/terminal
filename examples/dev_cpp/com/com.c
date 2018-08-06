@@ -4,10 +4,19 @@
 #include <stdio.h>
 
 HANDLE hSerial;
-char dbgbuffer[256];
+
+#define COM_BUFFER_SIZE			256
+
+struct
+{
+	char comBuffer[COM_BUFFER_SIZE];
+	int size;
+}COM;
 
 bool COM_Init(const char* comName)
 {
+	COM.size = 0;
+	
 	hSerial = CreateFile(comName, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	
 	if(hSerial == INVALID_HANDLE_VALUE)
@@ -64,9 +73,37 @@ void COM_Print(const char* str)
 	}
 }
 
-bool COM_Recieve(char *c)
+void COM_UpdateBuffer()
 {
-	DWORD size = 0;
-	ReadFile(hSerial, c, 1, &size, 0);
-	return size > 0;
+	if (COM.size < (COM_BUFFER_SIZE - 1))
+	{
+		DWORD size = 0;
+		char c;
+		ReadFile(hSerial, &c, 1, &size, 0);
+	
+		COM.comBuffer[COM.size] = c;
+		COM.size++;
+	}
+}
+
+bool COM_IsNotEmpty()	
+{ 
+	COM_UpdateBuffer();
+	return COM.size > 0; 
+}
+
+char COM_GetChar()
+{
+	char ret = 0;
+	if (COM.size > 0)
+	{
+		ret = COM.comBuffer[0];
+		
+		for(int i = 0; i < COM.size - 1; i++)
+		{
+			COM.comBuffer[i] = COM.comBuffer[i+1];
+		}
+		COM.size--;
+	}
+	return ret;
 }

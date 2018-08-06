@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "com/com.h"
+#include "irq/irq.h"
 
 #include "terminal_config.h"
 #include "terminal.h"
@@ -9,11 +10,11 @@
 static uint8_t _to_cmd();
 static uint8_t _tf_cmd();
 
-void ReceiveControl()
+char dbgbuffer[256];
+
+void IRQ_UartRxHandler()
 {
-	char c = 0;
-	if (COM_Recieve(&c))
-	   CLI_EnterChar(c);
+	CLI_EnterChar(COM_GetChar());
 }
 
 void delay_cnt(uint32_t cnt)
@@ -66,6 +67,9 @@ uint8_t _tf_cmd()
 
 int main(int argc, char *argv[]) {
 	
+	IRQ_SetVector(0, IRQ_UartRxHandler, COM_IsNotEmpty);
+	IRQ_Init();
+	
 	if (COM_Init("COM1"))
 	{	
 		CLI_Init(TDC_Time);
@@ -73,9 +77,9 @@ int main(int argc, char *argv[]) {
 		CLI_AddCmd("test_ok", _to_cmd, 1, TMC_PrintDiffTime, "test ok");
 		CLI_AddCmd("test_fail", _tf_cmd, 1, TMC_PrintDiffTime, "test fail");
 	
+		IRQ_Enable();
 		while(1)
 		{
-			ReceiveControl();
 			CLI_Execute();
 	    }
 	}
