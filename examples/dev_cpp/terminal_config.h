@@ -48,7 +48,7 @@
 #define STRING_TERM_ARROW		">> "				// String arrow enter
 #define RESET_FCN()									// Reset CPU Function
 
-#define TERM_TIMELEFT_EN				(0)			// Calculate time
+#define TERM_TIMELEFT_EN				(1)			// Calculate time
 #define TERM_TX_RX_EN					(1)			// Terminal Printf (without this don,t work)
 #define TERM_TX_RX_DEB_EN				(1)			// Addition debug printf
 #define TERM_CMD_LOG_EN					(1)			// Command logging
@@ -97,13 +97,14 @@ extern void COM_Putc(char c);
 
 #if (TERM_TIMELEFT_EN == 1)
 
-	// yout implementation
-extern volatile uint64_t SysTickCtr;							// Variable tackts cntr
+extern void STMR_Init();
+extern float STMR_GetUs();
+extern float STMR_GetMs();
 
-#define CLI_GetUs()					((float)SysTickCtr * 10)	// System time in us
-#define CLI_GetFastUs()				(SysTickCtr << 3)			// System time in us (not exact)
-#define CLI_GetFastMs()				(SysTickCtr >> 7)			// System time in ms (not exact)
-#define CLI_CounterReset()			{SysTickCtr = 0;}
+#define CLI_GetUs()					(STMR_GetUs())	// System time in us
+#define CLI_GetFastUs()				(STMR_GetUs())			// System time in us (not exact)
+#define CLI_GetFastMs()				(STMR_GetMs())			// System time in ms (not exact)
+#define CLI_CounterReset()			{STMR_Init();}
 
 #else	// TERM_TIMELEFT_EN != 1
 

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "com/com.h"
+#include "systimer/systimer.h"
 #include "irq/irq.h"
 
 #include "terminal_config.h"
@@ -27,6 +28,8 @@ void delay_cnt(uint32_t cnt)
 
 uint8_t _to_cmd()
 {
+	float startMs = STMR_GetMs();
+	
 	uint32_t count = 1;
 
 	// be sure arguments
@@ -38,8 +41,10 @@ uint8_t _to_cmd()
 	for(uint32_t i = 0; i < count; i++)
 	{
 		CLI_Printf("\r\n|  Test%d  |  OK  |", (int) i);
-		delay_cnt(500000000);
+		//delay_cnt(500000000);
 	}
+
+	CLI_Printf("\r\nDiff: %10.0f ms", STMR_GetMs() - startMs);
 
 	return TE_OK;
 }
@@ -60,12 +65,14 @@ uint8_t _tf_cmd()
 		else {
 			CLI_Printf("\r\n|  Test%d  | FAIL |", (int) i);
 		}
-		delay_cnt(500000000);
+		//delay_cnt(500000000);
 	}
 	return TE_OK;
 }
 
 int main(int argc, char *argv[]) {
+	
+	STMR_Init();
 	
 	IRQ_SetVector(0, IRQ_UartRxHandler, COM_IsNotEmpty);
 	IRQ_Init();

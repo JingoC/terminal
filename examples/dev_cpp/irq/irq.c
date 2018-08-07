@@ -12,8 +12,8 @@ static struct
 {
 	struct
 	{
-		void (*interrupts)();
-		bool (*checks)();
+		void (*interrupt)();
+		bool (*check)();
 	}Handlers[COUNT_VECTORS];
 	bool enable;
 }IRQ;
@@ -26,11 +26,11 @@ static DWORD WINAPI threadInterrupts(CONST LPVOID lpParam)
 		{
 			for(int i = 0; i < COUNT_VECTORS; i++)
 			{
-				if ((IRQ.Handlers[i].checks != NULL) && (IRQ.Handlers[i].checks()))
+				if ((IRQ.Handlers[i].check != NULL) && (IRQ.Handlers[i].check()))
 				{
-					IRQ.Handlers[i].interrupts();
+					IRQ.Handlers[i].interrupt();
 				}
-			}	
+			}
 		}
 		
 		Sleep(10);
@@ -42,8 +42,8 @@ void IRQ_Disable()	{ IRQ.enable = false; }
 
 void IRQ_SetVector(int vector, void (*handler)(), bool (*check)())
 {
-	IRQ.Handlers[vector].interrupts = handler;
-	IRQ.Handlers[vector].checks = check;
+	IRQ.Handlers[vector].interrupt = handler;
+	IRQ.Handlers[vector].check = check;
 }
 
 void IRQ_Init()
