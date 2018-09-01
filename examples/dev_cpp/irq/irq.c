@@ -18,7 +18,7 @@ static struct
 	bool enable;
 }IRQ;
 
-static DWORD WINAPI threadInterrupts(CONST LPVOID lpParam) 
+static DWORD WINAPI threadInterrupts(CONST LPVOID lpParam)
 {
 	while(true)
 	{
@@ -49,5 +49,5 @@ void IRQ_SetVector(int vector, void (*handler)(), bool (*check)())
 void IRQ_Init()
 {
 	IRQ_Disable();
-	HANDLE threadInterrupt = CreateThread(NULL, 0, &threadInterrupts, NULL, 0, NULL);
+	CreateThread(NULL, 0, &threadInterrupts, NULL, 0, NULL);
 }

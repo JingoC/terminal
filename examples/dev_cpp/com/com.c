@@ -1,66 +1,118 @@
 #include "com.h"
 
 #include <windows.h>
+#include <winbase.h>
 #include <stdio.h>
 
-HANDLE hSerial;
-
-#define COM_BUFFER_SIZE			256
+#define COM_BUFFER_SIZE			20
 
 struct
 {
-	char comBuffer[COM_BUFFER_SIZE];
-	int size;
+	HANDLE handle;
+	struct
+	{
+		char buffer[COM_BUFFER_SIZE];
+		int size;
+		bool lock;
+	}Fifo;
 }COM;
+
+static inline void _FIFO_Lock()			{ while(COM.Fifo.lock){} COM.Fifo.lock = true; }
+static inline void _FIFO_Unlock()		{ COM.Fifo.lock = false; }
+static inline bool _FIFO_IsFull()		{ return COM.Fifo.size == COM_BUFFER_SIZE; }
+static inline bool _FIFO_IsEmpty()		{ return COM.Fifo.size == 0; }
+static inline char _FIFO_Pop()			
+{ 
+	_FIFO_Lock();
+	char c = COM.Fifo.buffer[0];
+	for(int i = 0; i < COM.Fifo.size - 1; i++)
+		COM.Fifo.buffer[i] = COM.Fifo.buffer[i + 1];
+	COM.Fifo.size--;
+	_FIFO_Unlock();
+	return c;
+}
+
+static inline void _FIFO_Push(char c)
+{
+	_FIFO_Lock();
+	COM.Fifo.buffer[COM.Fifo.size] = c;
+	COM.Fifo.size++;
+	_FIFO_Unlock();
+}
+
+static void _COM_UpdateBuffer()
+{
+	if (!_FIFO_IsFull())
+	{
+		DWORD size = 0;
+		char c;
+		
+		ReadFile(COM.handle, &c, 1, &size, 0);
+		
+		if (size > 0)
+			_FIFO_Push(c);
+	}
+}
+
+static DWORD WINAPI _threadReadComPort(CONST LPVOID lpParam)
+{
+	while(true)
+		_COM_UpdateBuffer();
+	
+	CloseHandle(COM.handle);
+}
+
+inline bool COM_IsNotEmpty()		{ return !_FIFO_IsEmpty(); }
+
+inline char COM_GetChar()
+{
+	if (!_FIFO_IsEmpty())
+		return _FIFO_Pop();
+	
+	return 0;
+}
 
 bool COM_Init(const char* comName)
 {
-	COM.size = 0;
+	COM.handle = CreateFile(comName, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
 	
-	hSerial = CreateFile(comName, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	
-	if(hSerial == INVALID_HANDLE_VALUE)
-	{
-	   	if(GetLastError() == ERROR_FILE_NOT_FOUND)
-	    {
-	        printf("serial port does not exist.\n");
-	    }
-	    else
-	    {
-	    	printf("some other error occurred.\n");
-		}
-		
-		return false;
-	}
-	else
+	if(COM.handle != INVALID_HANDLE_VALUE)
 	{
 		DCB dcbSerialParams = {0};
-		dcbSerialParams.DCBlength=sizeof(dcbSerialParams);
-		if (!GetCommState(hSerial, &dcbSerialParams))
-		{
-		    printf("getting state error\n");
-		    return false;
-		}
-		dcbSerialParams.BaudRate=CBR_115200;
-		dcbSerialParams.ByteSize=8;
-		dcbSerialParams.StopBits=ONESTOPBIT;
-		dcbSerialParams.Parity=NOPARITY;
-		if(!SetCommState(hSerial, &dcbSerialParams))
-		{
-		    printf("error setting serial port state\n");
-		    return false;
-		}
+		dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
 		
+		if (!GetCommState(COM.handle, &dcbSerialParams))
+		    return false;
+		
+		dcbSerialParams.BaudRate = CBR_115200;
+		dcbSerialParams.ByteSize = 8;
+		dcbSerialParams.StopBits = ONESTOPBIT;
+		dcbSerialParams.Parity = NOPARITY;
+		
+		if(!SetCommState(COM.handle, &dcbSerialParams))
+		    return false;
+		
+		// without timeout mode settings
+		COMMTIMEOUTS CommTimeOuts={0xFFFFFFFF,0,0,0,1500};
+		if (!SetCommTimeouts(COM.handle, &CommTimeOuts))
+			return false;
+			
 		printf("serial port \"COM1\"-115200-8-1 init\n");
+		
+		COM.Fifo.size = 0;
+		_FIFO_Unlock();
+		CreateThread(NULL, 0, &_threadReadComPort, NULL, 0, NULL);
+		
+		return true;
 	}
 	
-	return true;
+	return false;
 }
 
 void COM_Putc(char c)
 {
 	DWORD dwBytesWritten;
-	WriteFile(hSerial, &c, 1, &dwBytesWritten, NULL);
+	WriteFile(COM.handle, &c, 1, &dwBytesWritten, NULL);
 }
 
 void COM_Print(const char* str)
@@ -71,39 +123,4 @@ void COM_Print(const char* str)
 		COM_Putc(str[i]);
 		i++;
 	}
-}
-
-void COM_UpdateBuffer()
-{
-	if (COM.size < (COM_BUFFER_SIZE - 1))
-	{
-		DWORD size = 0;
-		char c;
-		ReadFile(hSerial, &c, 1, &size, 0);
-	
-		COM.comBuffer[COM.size] = c;
-		COM.size++;
-	}
-}
-
-bool COM_IsNotEmpty()	
-{ 
-	COM_UpdateBuffer();
-	return COM.size > 0; 
-}
-
-char COM_GetChar()
-{
-	char ret = 0;
-	if (COM.size > 0)
-	{
-		ret = COM.comBuffer[0];
-		
-		for(int i = 0; i < COM.size - 1; i++)
-		{
-			COM.comBuffer[i] = COM.comBuffer[i+1];
-		}
-		COM.size--;
-	}
-	return ret;
 }

@@ -4,8 +4,8 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = main.o ../../lib/cli_queue.o ../../lib/cli_string.o ../../module/cli_log.o ../../module/cli_time.o ../../terminal.o com/com.o irq/irq.o systimer/systimer.o
-LINKOBJ  = main.o ../../lib/cli_queue.o ../../lib/cli_string.o ../../module/cli_log.o ../../module/cli_time.o ../../terminal.o com/com.o irq/irq.o systimer/systimer.o
+OBJ      = main.o ../../lib/cli_queue.o ../../lib/cli_string.o ../../module/cli_log.o ../../module/cli_time.o ../../terminal.o com/com.o irq/irq.o systimer/systimer.o commands/test_commands.o
+LINKOBJ  = main.o ../../lib/cli_queue.o ../../lib/cli_string.o ../../module/cli_log.o ../../module/cli_time.o ../../terminal.o com/com.o irq/irq.o systimer/systimer.o commands/test_commands.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -g3
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"D:/gitclone/terminal" -I"D:/gitclone/terminal/examples/dev_cpp"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++" -I"D:/gitclone/terminal" -I"D:/gitclone/terminal/examples/dev_cpp"
@@ -50,3 +50,6 @@ irq/irq.o: irq/irq.c
 
 systimer/systimer.o: systimer/systimer.c
 	$(CC) -c systimer/systimer.c -o systimer/systimer.o $(CFLAGS)
+
+commands/test_commands.o: commands/test_commands.c
+	$(CC) -c commands/test_commands.c -o commands/test_commands.o $(CFLAGS)
