@@ -4,7 +4,7 @@
 #include <winbase.h>
 #include <stdio.h>
 
-#define COM_BUFFER_SIZE			20
+#define COM_BUFFER_SIZE			256
 
 struct
 {

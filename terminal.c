@@ -4,6 +4,7 @@
 #include "lib/cli_string.h"
 #include "module/cli_time.h"
 #include "module/cli_log.h"
+#include "module/cli_input.h"
 
 #define printArrow()			{CLI_Printf(STRING_TERM_ENTER);CLI_Printf(STRING_TERM_ARROW);}	// Output of input line
 #define printArrowWithoutN()	{CLI_Printf(STRING_TERM_ARROW);}
@@ -49,7 +50,8 @@ inline bool CLI_GetIntState(){
 // *********************** Terminal fcns **********************************
 
 /// \brief Command settings
-typedef struct{
+typedef struct
+{
     uint8_t (*fcn)();			// callback function command
     const char* name;			// name command
 	uint8_t argc;				// min count argument
@@ -58,18 +60,12 @@ typedef struct{
 }TermCmd_s;
 
 /// \brief Terminal State
-struct{
-	Queue_s symbols;							// queue symbols input
-	char buf_transit[TERM_CMD_BUF_SIZE + 1];	// transit buffer
-	char buf_enter[TERM_CMD_BUF_SIZE + 1];		// input buffer
-	char buf_enter_exec[TERM_CMD_BUF_SIZE + 1];	// input buffer in execute command
-	int16_t buf_curPos;							// current cursos position
-	int16_t buf_cntr;							// current count input symbols
-	int16_t buf_cntr_exec;						// current count input symbols in execute command
+struct
+{
     TermCmd_s cmds[TERM_SIZE_TASK];				// list commands
     uint8_t countCommand;						// count commands
     uint8_t executeState;						// state terminal
-    volatile args input_args;					// args current execute command
+    volatile args inputArgs;					// args current execute command
     bool isEntered;								// 
 }Terminal;		// Терминал
 
@@ -86,16 +82,9 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
     CLI_Printf("\r\n****************************************************");
     CLI_Printf("\r\n");
 
+	INPUT_Init();
+	
     Terminal.countCommand = 0;
-    Terminal.buf_curPos = 0;
-    Terminal.buf_cntr = 0;
-    Terminal.buf_cntr_exec = 0;
-    Terminal.buf_transit[Terminal.buf_cntr] = '\0';
-    Terminal.buf_transit[TERM_CMD_BUF_SIZE] = '\0';
-    Terminal.buf_enter[Terminal.buf_cntr] = '\0';
-    Terminal.buf_enter[TERM_CMD_BUF_SIZE] = '\0';
-    Terminal.buf_enter_exec[Terminal.buf_cntr_exec] = '\0';
-    Terminal.buf_enter_exec[TERM_CMD_BUF_SIZE] = '\0';
     Terminal.executeState = 0;
     Terminal.isEntered = false;
 
@@ -122,17 +111,11 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
     CLI_Printf("\r\nMax command: %d", TERM_SIZE_TASK);
     CLI_Printf("\r\n");
 
-    Terminal.input_args.argv = (char**) cli_malloc(sizeof(char*) * TERM_ARGS_BUF_SIZE);
+    Terminal.inputArgs.argv = (char**) cli_malloc(sizeof(char*) * TERM_ARGS_BUF_SIZE);
     for(uint8_t i = 0; i < TERM_ARGS_BUF_SIZE; i++)
-        Terminal.input_args.argv[i] = cli_malloc(sizeof(char) * (TERM_ARG_SIZE + 1));
+        Terminal.inputArgs.argv[i] = cli_malloc(sizeof(char) * (TERM_ARG_SIZE + 1));
 
-    Q_Init(&Terminal.symbols, 3, sizeof(char), QUEUE_FORCED_PUSH_POP_Msk);
-    
-    for(uint8_t i = 0; i < 3; i++)
-    {
-    	char c = 0;
-    	Q_Push(&Terminal.symbols, &c);
-	}
+	
 	
 #if (TERM_CMD_LOG_EN == 1)
     CLI_LogInit();
@@ -145,9 +128,9 @@ void CLI_Init(TypeDefaultCmd_e defCmd){
 /// \param flag - searched string
 int8_t _IndexOfFlag(const char* flag)
 {
-	for(uint8_t i = 0; i < Terminal.input_args.argc; i++)
+	for(uint8_t i = 0; i < Terminal.inputArgs.argc; i++)
 	{
-		if (_strcmp(Terminal.input_args.argv[i], flag))
+		if (_strcmp(Terminal.inputArgs.argv[i], flag))
 		{
 			return i;
 		}
@@ -161,18 +144,18 @@ int8_t _IndexOfFlag(const char* flag)
 
 inline uint32_t CLI_GetArgDec(uint8_t index)
 {
-	return CLI_GetDecString(Terminal.input_args.argv[index + 1]);
+	return CLI_GetDecString(Terminal.inputArgs.argv[index + 1]);
 }
 
 inline uint32_t CLI_GetArgHex(uint8_t index)
 {
-	return CLI_GetHexString(Terminal.input_args.argv[index + 1]);
+	return CLI_GetHexString(Terminal.inputArgs.argv[index + 1]);
 }
 
 bool CLI_GetArgDecByFlag(const char* flag, uint32_t* outValue)
 {
 	int8_t w = _IndexOfFlag(flag);
-	if ((w > 0) && (w + 1 < Terminal.input_args.argc))
+	if ((w > 0) && (w + 1 < Terminal.inputArgs.argc))
 	{
 		*outValue = CLI_GetArgDec(w);
 		return true;
@@ -184,7 +167,7 @@ bool CLI_GetArgDecByFlag(const char* flag, uint32_t* outValue)
 bool CLI_GetArgHexByFlag(const char* flag, uint32_t* outValue)
 {
 	int8_t w = _IndexOfFlag(flag);
-	if ((w > 0) && (w + 1 < Terminal.input_args.argc))
+	if ((w > 0) && (w + 1 < Terminal.inputArgs.argc))
 	{
 		*outValue = CLI_GetArgHex(w);
 		return true;
@@ -245,7 +228,7 @@ TE_Result_e _Execute(char** argv, uint8_t argc)
 /// \return result execute command
 TE_Result_e _ExecuteString(const char* str)
 {
-	split((char*)str, " ", (args*) &Terminal.input_args);
+	split((char*)str, " ", (args*) &Terminal.inputArgs);
 
 #if 0
 	CLI_DPrintf("\r\nCMD: ");
@@ -257,9 +240,9 @@ TE_Result_e _ExecuteString(const char* str)
         CLI_DPrintf("\r\n: %s", Terminal.input_args.argv[i]);
 #endif
 
-    TE_Result_e result = _Execute(Terminal.input_args.argv, Terminal.input_args.argc);
+    TE_Result_e result = _Execute(Terminal.inputArgs.argv, Terminal.inputArgs.argc);
 
-	ArgDestroy((args*)&Terminal.input_args);
+	ArgDestroy((args*)&Terminal.inputArgs);
 
 #if (TERM_PRINT_ERROR_EXEC_EN == 1)
 	_PrintResultExec(result);
@@ -275,7 +258,7 @@ bool CLI_Execute()
 {
 	if (Terminal.isEntered == true)
 	{
-		_ExecuteString((const char*)Terminal.buf_transit);
+		_ExecuteString((const char*) INPUT_GetBuffer(TransitBuffer));
 		Terminal.isEntered = false;
 		
 		return true;
@@ -335,7 +318,8 @@ TA_Result_e CLI_AddCmd(const char* name, uint8_t (*fcn)(), uint8_t argc, uint16_
 /// \return none
 void _PrintResultExec(uint8_t code)
 {
-	switch(code){
+	switch(code)
+	{
         case TE_NotFound:	CLI_Printf("\n\rerr: Command not found");break;
         case TE_ArgErr: 	CLI_Printf("\n\rerr: Fault argument or Fault number arguments");break;
         case TE_ExecErr:	CLI_Printf("\n\rerr: Execute functions");break;
@@ -350,7 +334,8 @@ void _PrintResultExec(uint8_t code)
 void _PrintResultAddCmd(uint8_t code)
 {
 #if (TERM_PRINT_ERROR_ADD_CMD_EN == 1)
-	switch(code){
+	switch(code)
+	{
         case TA_MaxCmd:		CLI_Printf("\n\radd cmd err: Memory is full");break;
         case TA_FcnNull: 	CLI_Printf("\n\radd cmd err: Function callback is NULL");break;
         case TA_EmptyName:	CLI_Printf("\n\radd cmd err: Empty name command");break;
@@ -365,16 +350,15 @@ void _PrintResultAddCmd(uint8_t code)
 TermCmd_s* _findTermCmd(const char* cmdName)
 {
     uint8_t i = 0;
-    for(; i < Terminal.countCommand; i++){
-
+    for(; i < Terminal.countCommand; i++)
+	{
     	char* name1 = (char*) Terminal.cmds[i].name;
     	char* name2 = (char*) cmdName;
 
     	int res = _strcmp(name1, name2);
 
-        if (res){
+        if (res)
             return &Terminal.cmds[i];
-        }
     }
 
     return NULL;
@@ -387,14 +371,15 @@ TermCmd_s* _findPartTermCmd(const char* cmdName)
 	TermCmd_s* result = NULL;
 	
 	uint8_t i = 0;
-    for(; i < Terminal.countCommand; i++){
-
+    for(; i < Terminal.countCommand; i++)
+	{
     	char* name1 = (char*) Terminal.cmds[i].name;
     	char* name2 = (char*) cmdName;
 	
     	int res = _strPartCmp(name1, name2);
 
-        if (res){
+        if (res)
+		{
         	if (result != NULL)
         	{
         		return NULL;
@@ -415,8 +400,9 @@ uint8_t _help_cmd()
 {
     CLI_Printf("\r\nCount command: %d", (int) Terminal.countCommand);
     CLI_Printf("\r\n[] - mandatory argument\r\n<> - optional argument\r\n| - choice between arguments");
-	uint16_t i = 1;
-	for(; i < Terminal.countCommand; i++){
+	
+	for(uint16_t i = 1; i < Terminal.countCommand; i++)
+	{
         CLI_Printf("\r\n\n%-10s - %s", Terminal.cmds[i].name, Terminal.cmds[i].description);
         CLI_Printf("\r\n-----------------------------------------------------------------");
 	}
@@ -515,205 +501,19 @@ void CLI_PrintTimeWithoutRN()
 #endif
 }
 
-static void _UpdateCmd(const char* newCmd)
-{
-    CLI_PutChar('\r');
-	printArrowWithoutN();
-
-	if (Terminal.buf_enter != newCmd)
-	{
-		uint32_t lenNewCmd = _strlen(newCmd);
-		uint32_t lenCurCmd = Terminal.buf_cntr;
-		cli_memcpy(Terminal.buf_enter, newCmd, lenNewCmd);
-	
-		Terminal.buf_cntr = lenNewCmd;
-		Terminal.buf_curPos = lenNewCmd;
-
-		for(uint8_t i = 0; i < lenNewCmd; i++)
-		{
-			CLI_PutChar(Terminal.buf_enter[i]);
-		}
-
-		uint8_t cntSpcChar = 0;
-		for(uint8_t i = lenNewCmd; i < lenCurCmd; i++)
-		{
-			CLI_PutChar(' ');
-			cntSpcChar++;
-		}
-
-		for(uint8_t i = 0; i < cntSpcChar; i++)
-        	{CLI_PutChar(TERM_KEY_BACKSPACE);}	
-        	
-#if 0
-		CLI_DPrintf("\r\nNewCmd: %s", newCmd);
-		CLI_DPrintf("\r\nlenNewCmd: %d", lenNewCmd);
-#endif
-
-	}
-	else
-	{
-		for(uint8_t i = 0; i < Terminal.buf_cntr; i++)
-		{
-			CLI_PutChar(Terminal.buf_enter[i]);
-		}
-#if 0
-		CLI_DPrintf("\r\nBufEnter: %s", Terminal.buf_enter);
-		CLI_DPrintf("\r\nlenNewCmd: %d", Terminal.buf_cntr);
-#endif
-	}
-}
-
-static void _AddChar(char c)
-{
-#if (TERM_LR_KEY_EN == 1)
-	if (Terminal.buf_curPos != Terminal.buf_cntr)
-	{
-		uint8_t tmpPos = Terminal.buf_curPos;
-		cli_memcpy(Terminal.buf_transit, Terminal.buf_enter, tmpPos);
-		cli_memcpy(Terminal.buf_transit + tmpPos, &c, 1);
-		cli_memcpy(Terminal.buf_transit + tmpPos + 1, Terminal.buf_enter + tmpPos, Terminal.buf_cntr - tmpPos);
-		Terminal.buf_transit[Terminal.buf_cntr + 1] = '\0';
-		
-		Terminal.buf_cntr++;
-		Terminal.buf_curPos++;
-		Terminal.buf_enter[Terminal.buf_cntr] = '\0';
-
-		tmpPos++;
-		_UpdateCmd(Terminal.buf_transit);
-
-		for(uint8_t pos = 0; pos < Terminal.buf_cntr - tmpPos; pos++)
-		{
-            CLI_PutChar(TERM_KEY_LSHIFT);
-			Terminal.buf_curPos--;
-		}
-	}
-	else
-	{
-        CLI_PutChar(c);
-		Terminal.buf_enter[Terminal.buf_curPos] = c;
-		Terminal.buf_cntr++;
-		Terminal.buf_curPos++;
-		Terminal.buf_enter[Terminal.buf_cntr] = '\0';
-	}
-
-#else
-    CLI_PutChar(c);
-	Terminal.buf_enter[Terminal.buf_curPos] = c;
-	Terminal.buf_cntr++;
-	Terminal.buf_curPos++;
-	Terminal.buf_enter[Terminal.buf_cntr] = '\0';
-#endif
-}
-
-static void _RemChar()
-{
-#if (TERM_LR_KEY_EN == 1)
-
-	if (Terminal.buf_curPos != Terminal.buf_cntr)
-	{
-		// save current position cursor
-		uint8_t tmpPos = Terminal.buf_curPos - 1;
-
-		cli_memcpy(Terminal.buf_transit, Terminal.buf_enter, tmpPos);
-		cli_memcpy(Terminal.buf_transit + tmpPos, Terminal.buf_enter + tmpPos + 1, Terminal.buf_cntr - tmpPos);
-		
-		Terminal.buf_transit[Terminal.buf_cntr - 1] = '\0';
-		
-		_UpdateCmd(Terminal.buf_transit);
-
-		for(uint8_t pos = 0; pos < Terminal.buf_cntr - tmpPos; pos++)
-		{
-            CLI_PutChar(TERM_KEY_LSHIFT);
-			Terminal.buf_curPos--;
-		}
-	}
-	else
-	{
-        CLI_PutChar(TERM_KEY_BACKSPACE);
-        CLI_PutChar(' ');
-        CLI_PutChar(TERM_KEY_BACKSPACE);
-        
-		Terminal.buf_curPos--;
-		Terminal.buf_cntr--;
-		Terminal.buf_enter[Terminal.buf_cntr] = '\0';
-	}
-#else
-    CLI_PutChar(TERM_KEY_BACKSPACE);
-    CLI_PutChar(' ');
-    CLI_PutChar(TERM_KEY_BACKSPACE);
-
-	Terminal.buf_curPos--;
-	Terminal.buf_cntr--;
-	Terminal.buf_enter[Terminal.buf_cntr] = '\0';
-#endif
-}
-
 /// \brief Append new symbols
 TC_Result_e CLI_EnterChar(char ch)
 {
-	char c = ch;
-	
 	static bool rstUnlock = false;
-	if(rstUnlock && (c != TERM_KEY_RESET))
+	if(rstUnlock && (ch != TERM_KEY_RESET))
 		rstUnlock = false;
-	
-	/*
-	uint8_t* write_buffer = (uint8_t*)Terminal.buf_enter;
-	int16_t* write_cntr = &Terminal.buf_cntr;
-
-	if (Terminal.executeState == 1)
-	{
-		write_buffer = &Terminal.buf_cntr_exec;
-		write_cntr = &Terminal.buf_cntr_exec;
-	}
-	 */
-
-	Q_Push(&Terminal.symbols, &c);
-	/*
-	TerminalTx("\r\nPrintQ: ");
-	for(uint8_t i = 0; i < Terminal.symbols._cntr; i++)
-	{TerminalTx("%02X ",*((char*) (Terminal.symbols.ptrObj + i)));}
-	 */
-
-	uint8_t arr_up[]	= {0x1B, 0x5B, 0x41};
-	uint8_t arr_down[]	= {0x1B, 0x5B, 0x42};
-	uint8_t arr_right[] = {0x1B, 0x5B, 0x43};
-	uint8_t arr_left[]	= {0x1B, 0x5B, 0x44};
-	uint8_t arr_esc[]	= {0x1B, 0x1B, 0x1B};
-	uint8_t del[]		= {0x1B, 0x5B, 0x33};
-	uint8_t home[]		= {0x1B, 0x5B, 0x31};
-	uint8_t end[]		= {0x1B, 0x5B, 0x34};
-	
-	if (Q_IsEqual(&Terminal.symbols, arr_up, 3))
-		{c = TERM_KEY_UP;}
-	else if (Q_IsEqual(&Terminal.symbols, arr_down, 3))
-		{c = TERM_KEY_DOWN;}
-	else if (Q_IsEqual(&Terminal.symbols, arr_right, 3))
-		{c = TERM_KEY_RIGHT;}
-	else if (Q_IsEqual(&Terminal.symbols, arr_left, 3))
-		{c = TERM_KEY_LEFT;}
-	else if (Q_IsEqual(&Terminal.symbols, arr_esc, 3))
-		{c = TERM_KEY_ESCAPE;}
-	else if (Q_IsEqual(&Terminal.symbols, del, 3))
-		{c = TERM_KEY_DEL;}
-	else if (Q_IsEqual(&Terminal.symbols, home, 3))
-		{c = TERM_KEY_HOME;}
-	else if (Q_IsEqual(&Terminal.symbols, end, 3))
-		{c = TERM_KEY_END;}
-	
-	bool isValidKey = ((Terminal.buf_cntr < TERM_CMD_BUF_SIZE) ||
-						(c == TERM_KEY_BACKSPACE) ||
-						(c == TERM_KEY_ENTER)	||
-						(c == CHAR_INTERRUPT));
-
-	bool isAlphaBet = (((c > 0x2F) && (c < 0x3A)) ||
-						((c > 0x60) && (c < 0x7B)) ||
-						((c > 0x40) && (c < 0x5B)) ||
-						(c == 0x20) || (c == '_') || (c == '-'));
+		
+	InputValue_s iv = INPUT_PutChar(ch);
+	char c = iv.keyCode;
 
 	if (Terminal.isEntered)
 	{
-		if (!((c == CHAR_INTERRUPT) || (c == TERM_KEY_RESET)))
+		if (!((ch == CHAR_INTERRUPT) || (ch == TERM_KEY_RESET)))
 			return TC_Ignore;
 	}
 	
@@ -723,15 +523,15 @@ TC_Result_e CLI_EnterChar(char ch)
 	{
 		CLI_DPrintf("0x%02X ", (char) *((char*)(Terminal.symbols.ptrObj + i)));
 	}
-    CLI_DPrintf("\r\nKey Code: 0x%02X", (uint8_t) c);
+    CLI_DPrintf("\r\nKey Code: 0x%02X", (uint8_t) ch);
 #endif
-	if (isValidKey)
+	if (iv.isValid)
 	{
 		switch(c)
 		{
 			case TERM_KEY_ENTER:
 			{
-				if (Terminal.buf_cntr == 0)
+				if (INPUT_IsEmpty())
 				{
 					printArrow();
 					return TC_Ignore;
@@ -739,21 +539,23 @@ TC_Result_e CLI_EnterChar(char ch)
 				
 				Terminal.isEntered = true;
 				
-				Terminal.buf_enter[Terminal.buf_cntr] = '\0';
-				cli_memcpy(Terminal.buf_transit, Terminal.buf_enter, Terminal.buf_cntr + 1);
+				INPUT_Cache();
 
 #if (TERM_CMD_LOG_EN == 1)
-				CLI_LogCmdPush(Terminal.buf_enter);
+				CLI_LogCmdPush(INPUT_GetBuffer(MainBuffer));
 				CLI_CurReset();
 #endif
-				Terminal.buf_curPos = 0;
-				Terminal.buf_cntr = 0;
-				Terminal.buf_enter[Terminal.buf_cntr] = '\0';
+				
+				INPUT_Reset();
 
 				return TC_Enter;
 			}break;
-			case CHAR_INTERRUPT:		{_interrupt_operation = true;CLI_Printf("\r\nKey ESC");}break;
-			case TERM_KEY_BACKSPACE:	{if (Terminal.buf_curPos > 0){_RemChar();}}break;
+			case CHAR_INTERRUPT:
+			{
+				_interrupt_operation = true;
+				CLI_Printf("\r\nKey ESC");
+			}break;
+			case TERM_KEY_BACKSPACE:	INPUT_Backspace(); break;
 			case TERM_KEY_RESET:
 			{
 				if(rstUnlock)
@@ -762,25 +564,22 @@ TC_Result_e CLI_EnterChar(char ch)
 					return TC_Reset;
 				}
 				else
-				{
 					rstUnlock = true;
-				}
 			}break;
 			case TERM_KEY_TAB:
 			{
 #if (TERM_CMD_AUTOCMPLT_EN == 1)
-				if ((Terminal.buf_cntr > 0) && (Terminal.buf_enter[Terminal.buf_cntr - 1] != ' '))
+				if ((!INPUT_IsEmpty()) && (INPUT_GetLastChar() != ' '))
 				{
-					TermCmd_s* cmd = _findPartTermCmd(Terminal.buf_enter);
+					char* buf = INPUT_GetBuffer(MainBuffer);
+					TermCmd_s* cmd = _findPartTermCmd(buf);
 					
 					if (cmd != NULL)
 					{
 						uint8_t len = _strlen(cmd->name);
-						cli_memcpy(Terminal.buf_enter, cmd->name, len + 1);
-					
-						Terminal.buf_cntr = len;
-						Terminal.buf_curPos = len;
-						_UpdateCmd(Terminal.buf_enter);
+						
+						INPUT_SetBuffer(MainBuffer, (char*)cmd->name, len + 1);
+						INPUT_Refresh(buf);
 					}
 				}
 #endif
@@ -790,7 +589,7 @@ TC_Result_e CLI_EnterChar(char ch)
 #if (TERM_CMD_LOG_EN == 1)
 				const char* ptrCmd = CLI_GetNextCmd();
 				if (ptrCmd != NULL)
-					{_UpdateCmd(ptrCmd);}
+					INPUT_Refresh(ptrCmd);
 #endif
 			}break;
 			case TERM_KEY_UP:
@@ -798,68 +597,27 @@ TC_Result_e CLI_EnterChar(char ch)
 #if (TERM_CMD_LOG_EN == 1)
 				const char* ptrCmd = CLI_GetLastCmd();
 				if (ptrCmd != NULL)
-					{_UpdateCmd(ptrCmd);}
+					INPUT_Refresh(ptrCmd);
 #endif
 			}break;
-			case TERM_KEY_LEFT:
-			{
 #if (TERM_LR_KEY_EN == 1)
-				if (Terminal.buf_curPos > 0)
-				{
-					Terminal.buf_curPos--;
-                    CLI_PutChar(TERM_KEY_LSHIFT);
-				}
+			case TERM_KEY_LEFT:		INPUT_CursorToLeft(); break;
 #endif
-			}break;
-			case TERM_KEY_RIGHT:
-			{
 #if (TERM_LR_KEY_EN == 1)
-				if (Terminal.buf_curPos < Terminal.buf_cntr)
-				{
-                    CLI_PutChar(Terminal.buf_enter[Terminal.buf_curPos]);
-					Terminal.buf_curPos++;
-				}
+			case TERM_KEY_RIGHT:	INPUT_CursorToRight(); break;
 #endif
-			}break;
-			case TERM_KEY_DEL:
-			{
-				if ((Terminal.buf_curPos != Terminal.buf_cntr) && (Terminal.buf_cntr != 0))
-				{
-					Terminal.buf_curPos++;
-					if(Terminal.buf_curPos == Terminal.buf_cntr)
-					{
-						CLI_PutChar(Terminal.buf_enter[Terminal.buf_curPos - 1]);
-					}
-					_RemChar();
-				}
-			}break;
-			case TERM_KEY_HOME:
-			{
-				while(Terminal.buf_curPos > 0)
-				{
-					CLI_PutChar(TERM_KEY_LSHIFT);
-					Terminal.buf_curPos--;
-				}
-			}break;
-			case TERM_KEY_END:
-			{
-				while(Terminal.buf_curPos < Terminal.buf_cntr)
-				{
-					CLI_PutChar(Terminal.buf_enter[Terminal.buf_curPos]);
-					Terminal.buf_curPos++;
-				}
-			}break;
+			case TERM_KEY_DEL:		INPUT_Delete(); break;
+			case TERM_KEY_HOME:		INPUT_CursorToHome(); break;
+			case TERM_KEY_END:		INPUT_CursorToEnd(); break;
 			default:
 			{
-				if (isAlphaBet)
-				{
-					if (Terminal.buf_cntr < TERM_CMD_BUF_SIZE)
-						{_AddChar(c);}
-				}
+				if (iv.isAlphaBet && !INPUT_IsFull())
+					INPUT_AddChar(c);
 			}break;
 		}
 	}
-	else {
+	else
+	{
 		return TC_BufFull;
 	}
 

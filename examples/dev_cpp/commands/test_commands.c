@@ -34,8 +34,20 @@ uint8_t _tf_cmd()
 	return TE_OK;
 }
 
+uint8_t _delay_cmd()
+{
+	float delayMs = CLI_GetArgDec(0);
+	
+	float ms = CLI_GetFastMs();
+	while((CLI_GetFastMs() - ms) < delayMs) {}
+	
+	return TE_OK;
+}
+
 void TestCommands_Init()
 {
 	CLI_AddCmd("test_ok", _to_cmd, 1, TMC_PrintDiffTime, "test ok");
 	CLI_AddCmd("test_fail", _tf_cmd, 1, TMC_PrintDiffTime, "test fail");
+	CLI_AddCmd("delay", _delay_cmd, 1, 
+						TMC_PrintDiffTime|TMC_PrintStartTime|TMC_PrintStopTime, "delay in ms");
 }

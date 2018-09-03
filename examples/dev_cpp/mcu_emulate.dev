@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=00000000e0000000001000000
-UnitCount=20
+UnitCount=22
 
 [VersionInfo]
 Major=1
@@ -244,6 +244,26 @@ BuildCmd=
 FileName=commands\test_commands.h
 CompileCpp=0
 Folder=commands
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit21]
+FileName=..\..\module\cli_input.c
+CompileCpp=0
+Folder=terminal/module
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit22]
+FileName=..\..\module\cli_input.h
+CompileCpp=0
+Folder=terminal/module
 Compile=1
 Link=1
 Priority=1000
