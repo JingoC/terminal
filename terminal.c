@@ -65,7 +65,7 @@ struct
     TermCmd_s cmds[TERM_SIZE_TASK];				// list commands
     uint8_t countCommand;						// count commands
     uint8_t executeState;						// state terminal
-    volatile args inputArgs;					// args current execute command
+    volatile Params_s inputArgs;				// args current execute command
     bool isEntered;								// 
 }Terminal;		// Терминал
 
@@ -228,7 +228,7 @@ TE_Result_e _Execute(char** argv, uint8_t argc)
 /// \return result execute command
 TE_Result_e _ExecuteString(const char* str)
 {
-	split((char*)str, " ", (args*) &Terminal.inputArgs);
+	split((char*)str, " ", (Params_s*) &Terminal.inputArgs);
 
 #if 0
 	CLI_DPrintf("\r\nCMD: ");
@@ -242,7 +242,7 @@ TE_Result_e _ExecuteString(const char* str)
 
     TE_Result_e result = _Execute(Terminal.inputArgs.argv, Terminal.inputArgs.argc);
 
-	ArgDestroy((args*)&Terminal.inputArgs);
+	ArgDestroy((Params_s*)&Terminal.inputArgs);
 
 #if (TERM_PRINT_ERROR_EXEC_EN == 1)
 	_PrintResultExec(result);
@@ -381,9 +381,7 @@ TermCmd_s* _findPartTermCmd(const char* cmdName)
         if (res)
 		{
         	if (result != NULL)
-        	{
         		return NULL;
-			}
 			
             result = &Terminal.cmds[i];
         }

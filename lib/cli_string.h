@@ -8,12 +8,10 @@
 typedef struct{
 	uint8_t argc;
 	char** argv;
-}string_a_Arg;
+}Params_s;
 
-typedef string_a_Arg args;
+void ArgDestroy(Params_s* src);
 
-void ArgDestroy(args* src);
-
-void split(char* strSrc, const char* separator, args* dst);
+void split(char* strSrc, const char* separator, Params_s* dst);
 
 #endif // _CLI_STRING_A_H

@@ -8,7 +8,7 @@ uint32_t _strlen(const char* strSrc);
 uint16_t _getCountSeparator(const char* str, const char* separator);
 
 /// \brief Splitting a string by a given separator
-void split(char* strSrc, const char* separator, args* dst)
+void split(char* strSrc, const char* separator, Params_s* dst)
 {
     uint8_t count_sep = _getCountSeparator(strSrc, separator);
     uint16_t lenSep = _strlen((char*)separator);
@@ -50,7 +50,7 @@ void split(char* strSrc, const char* separator, args* dst)
 
 /// \brief free memory
 /// \return none
-void ArgDestroy(args* src)
+void ArgDestroy(Params_s* src)
 {
 	/*
     for(int8_t i = src->argc - 1; i > 0; i--)
