@@ -5,7 +5,7 @@ Flexible terminal settings allow you to integrate it with any microcontroller, w
 
 #### Features:
 + Flexible setup
-+ Platform detachment
++ Platform independent
 + Logging commands
 + The mechanism for aborting execution
 + Available keys KeyLeft, KeyRight, Delete, BackSpace, Home, End, Tab
