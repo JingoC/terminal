@@ -1,0 +1,14 @@
+{
+    "name": "C++ Launch (Windows)",
+    "type": "cppvsdbg",
+    "request": "launch",
+    "program": "C:\\app1\\Debug\\app1.exe",
+    "symbolSearchPath": "D:\\projects\\my\\c\\terminal;D:\\projects\\my\\c\\terminal\\examples\\vcode",
+    "externalConsole": true,
+    "logging": {
+      "moduleLoad": false,
+      "trace": true
+    },
+    "visualizerFile": "${workspaceFolder}/my.natvis",
+    "showDisplayString": true
+}

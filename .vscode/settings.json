@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "terminal_config.h": "c",
+        "cli_interface.h": "c"
+    }
+}
