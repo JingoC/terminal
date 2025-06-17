@@ -287,10 +287,7 @@ void INPUT_Delete()
 	if ((Input.CurBuffer->CursorInBuffer != Input.CurBuffer->BufferCount) && (!INPUT_IsEmpty()))
 	{
 		INPUT_CursorShift(1);
-		if(Input.CurBuffer->CursorInBuffer != Input.CurBuffer->BufferCount)
-		{
-			CLI_PutChar(Input.CurBuffer->Data[Input.CurBuffer->CursorInBuffer - 1]);
-		}
+		CLI_PutChar(Input.CurBuffer->Data[Input.CurBuffer->CursorInBuffer - 1]);
 		INPUT_RemChar();
 	}	
 }
