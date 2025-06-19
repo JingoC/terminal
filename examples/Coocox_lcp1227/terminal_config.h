@@ -45,6 +45,7 @@ extern void _reset_fcn();
 #define TERM_ARGS_BUF_SIZE		(10)				// Max number of arguments in one command
 #define TERM_ARG_SIZE			(15)				// Max number character of one arguments
 #define CHAR_INTERRUPT			TERM_KEY_ESCAPE 	// Abort execute command key-code symbol
+#define CHAR_BACKSPACE			'\x08'			// Backspace char
 #define STRING_TERM_ENTER		"\n\r"				// String new line
 #define STRING_TERM_ARROW		">> "				// String arrow enter
 #define RESET_FCN				_reset_fcn			// Reset CPU Function
