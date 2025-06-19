@@ -34,9 +34,9 @@ static void _AddChar(char c)
 
 static void _RemChar()
 {
-	CLI_PutChar(TERM_KEY_BACKSPACE);
+	CLI_PutChar(CHAR_BACKSPACE);
     CLI_PutChar(' ');
-    CLI_PutChar(TERM_KEY_BACKSPACE);
+    CLI_PutChar(CHAR_BACKSPACE);
     
 	Input.CurBuffer->CursorInBuffer--;
 	Input.CurBuffer->BufferCount--;
@@ -70,7 +70,7 @@ void INPUT_Refresh(const char* newCmd)
 		}
 		
 		for(uint8_t i = 0; i < cntSpcChar; i++)
-        	{CLI_PutChar(TERM_KEY_BACKSPACE);}	
+        	{CLI_PutChar(CHAR_BACKSPACE);}	
         
 #if 0
 		CLI_DPrintf("\r\nNewCmd: %s", newCmd);
@@ -115,7 +115,7 @@ void INPUT_RemChar()
 
 		for(uint8_t pos = 0; pos < Input.CurBuffer->BufferCount - tmpPos; pos++)
 		{
-            CLI_PutChar(TERM_KEY_LSHIFT);
+            CLI_PutChar(CHAR_BACKSPACE);
 			Input.CurBuffer->CursorInBuffer--;
 		}
 	}
@@ -148,7 +148,7 @@ void INPUT_AddChar(char c)
 
 		for(uint8_t pos = 0; pos < Input.CurBuffer->BufferCount - tmpPos; pos++)
 		{
-            CLI_PutChar(TERM_KEY_LSHIFT);
+            CLI_PutChar(CHAR_BACKSPACE);
 			Input.CurBuffer->CursorInBuffer--;
 		}
 	}
@@ -250,7 +250,7 @@ void INPUT_CursorToHome()
 {
 	while(Input.CurBuffer->CursorInBuffer > 0)
 	{
-		CLI_PutChar(TERM_KEY_LSHIFT);
+		CLI_PutChar(CHAR_BACKSPACE);
 		INPUT_CursorShift(-1);
 	}
 }
@@ -269,7 +269,7 @@ void INPUT_CursorToLeft()
 	if (Input.CurBuffer->CursorInBuffer > 0)
 	{
 		INPUT_CursorShift(-1);
-        CLI_PutChar(TERM_KEY_LSHIFT);
+        CLI_PutChar(CHAR_BACKSPACE);
 	}
 }
 
@@ -287,6 +287,10 @@ void INPUT_Delete()
 	if ((Input.CurBuffer->CursorInBuffer != Input.CurBuffer->BufferCount) && (!INPUT_IsEmpty()))
 	{
 		INPUT_CursorShift(1);
+		if(Input.CurBuffer->CursorInBuffer != Input.CurBuffer->BufferCount)
+		{
+			CLI_PutChar(Input.CurBuffer->Data[Input.CurBuffer->CursorInBuffer - 1]);
+		}
 		CLI_PutChar(Input.CurBuffer->Data[Input.CurBuffer->CursorInBuffer - 1]);
 		INPUT_RemChar();
 	}	
